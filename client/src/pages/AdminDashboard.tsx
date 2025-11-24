@@ -255,7 +255,7 @@ function GamesManager() {
                   {game.isLive && <Badge variant="default">LIVE</Badge>}
                   {game.isFinal && <Badge variant="secondary">FINAL</Badge>}
                 </div>
-                <p className="font-semibold">{game.awayTeam} @ {game.homeTeam}</p>
+                <p className="font-semibold">{game.team2} vs {game.team1}</p>
                 <p className="text-sm text-muted-foreground">
                   {format(new Date(game.gameTime), "MMM d, yyyy 'at' h:mm a")}
                 </p>
@@ -318,7 +318,7 @@ function ScoresManager() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold">{game.awayTeam} @ {game.homeTeam}</p>
+                    <p className="font-semibold">{game.team2} vs {game.team1}</p>
                     <p className="text-sm text-muted-foreground">Week {game.week}</p>
                   </div>
                   <Badge>{game.quarter}</Badge>
@@ -326,35 +326,35 @@ function ScoresManager() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <Label htmlFor={`away-${game.id}`}>Away Score</Label>
+                    <Label htmlFor={`team2-${game.id}`}>Team 2 Score</Label>
                     <Input
-                      id={`away-${game.id}`}
+                      id={`team2-${game.id}`}
                       type="number"
                       min="0"
-                      defaultValue={game.awayScore || 0}
+                      defaultValue={game.team2Score || 0}
                       onBlur={(e) => {
                         const newScore = parseInt(e.target.value) || 0;
-                        if (newScore !== game.awayScore) {
-                          updateMutation.mutate({ id: game.id, data: { awayScore: newScore } });
+                        if (newScore !== game.team2Score) {
+                          updateMutation.mutate({ id: game.id, data: { team2Score: newScore } });
                         }
                       }}
-                      data-testid={`input-away-score-${game.id}`}
+                      data-testid={`input-team2-score-${game.id}`}
                     />
                   </div>
                   <div>
-                    <Label htmlFor={`home-${game.id}`}>Home Score</Label>
+                    <Label htmlFor={`team1-${game.id}`}>Team 1 Score</Label>
                     <Input
-                      id={`home-${game.id}`}
+                      id={`team1-${game.id}`}
                       type="number"
                       min="0"
-                      defaultValue={game.homeScore || 0}
+                      defaultValue={game.team1Score || 0}
                       onBlur={(e) => {
                         const newScore = parseInt(e.target.value) || 0;
-                        if (newScore !== game.homeScore) {
-                          updateMutation.mutate({ id: game.id, data: { homeScore: newScore } });
+                        if (newScore !== game.team1Score) {
+                          updateMutation.mutate({ id: game.id, data: { team1Score: newScore } });
                         }
                       }}
-                      data-testid={`input-home-score-${game.id}`}
+                      data-testid={`input-team1-score-${game.id}`}
                     />
                   </div>
                   <div>
