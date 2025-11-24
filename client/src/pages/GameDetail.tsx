@@ -141,11 +141,9 @@ export default function GameDetail() {
                     {game.team2}
                   </h2>
                 </div>
-                {!isScheduled && (
-                  <div className={`text-6xl md:text-7xl font-black tabular-nums ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team2-score">
-                    {game.team2Score}
-                  </div>
-                )}
+                <div className={`text-6xl md:text-7xl font-black tabular-nums ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team2-score">
+                  {game.team2Score}
+                </div>
               </div>
 
               <div className="flex items-center justify-between py-4">
@@ -154,11 +152,9 @@ export default function GameDetail() {
                     {game.team1}
                   </h2>
                 </div>
-                {!isScheduled && (
-                  <div className={`text-6xl md:text-7xl font-black tabular-nums ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team1-score">
-                    {game.team1Score}
-                  </div>
-                )}
+                <div className={`text-6xl md:text-7xl font-black tabular-nums ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team1-score">
+                  {game.team1Score}
+                </div>
               </div>
             </div>
 
