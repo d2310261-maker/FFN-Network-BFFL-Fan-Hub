@@ -67,9 +67,9 @@ export default function Schedule() {
               </h2>
               <div className="space-y-3">
                 {gamesByWeek[week].map((game) => {
-                  const gameDate = new Date(game.gameTime);
-                  const isUpcoming = isFuture(gameDate);
-                  const isCompleted = isPast(gameDate) || game.isFinal;
+                  const gameDate = game.gameTime ? new Date(game.gameTime) : null;
+                  const isUpcoming = gameDate ? isFuture(gameDate) : false;
+                  const isCompleted = gameDate ? (isPast(gameDate) || game.isFinal) : game.isFinal;
 
                   return (
                     <Card key={game.id} className="p-4 hover-elevate" data-testid={`card-game-${game.id}`}>
@@ -99,7 +99,7 @@ export default function Schedule() {
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="w-4 h-4" />
                             <span data-testid={`text-datetime-${game.id}`}>
-                              {format(gameDate, "EEE, MMM d 'at' h:mm a")}
+                              {gameDate ? format(gameDate, "EEE, MMM d 'at' h:mm a") : "Time TBD"}
                             </span>
                           </div>
                           {game.location && (
