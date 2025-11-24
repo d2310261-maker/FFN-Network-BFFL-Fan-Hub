@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Check } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 interface StandingsEntry {
   id: string;
@@ -45,7 +45,6 @@ export default function Standings() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
-  const [editingIds, setEditingIds] = useState<string[]>([]);
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"D1" | "D2" | "D3" | "D4">("D1");
 
@@ -122,16 +121,9 @@ export default function Standings() {
       entry.id === id ? { ...entry, [field]: value } : entry
     );
     setStandings(updated);
-    if (!editingIds.includes(id)) {
-      setEditingIds([...editingIds, id]);
-    }
-  };
-
-  const saveEntry = (id: string) => {
-    const entry = standings.find(e => e.id === id);
+    const entry = updated.find(e => e.id === id);
     if (entry) {
       upsertMutation.mutate(entry);
-      setEditingIds(editingIds.filter(eid => eid !== id));
     }
   };
 
@@ -286,29 +278,15 @@ export default function Standings() {
                             </td>
                             {isAuthenticated && (
                               <td className="px-6 py-4 text-sm text-center">
-                                <div className="flex gap-2 justify-center">
-                                  {editingIds.includes(entry.id) && (
-                                    <Button
-                                      onClick={() => saveEntry(entry.id)}
-                                      data-testid={`button-save-${entry.id}`}
-                                      disabled={upsertMutation.isPending}
-                                      size="sm"
-                                      className="gap-1"
-                                    >
-                                      <Check className="w-4 h-4" />
-                                      Save
-                                    </Button>
-                                  )}
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => deleteEntry(entry.id)}
-                                    data-testid={`button-delete-${entry.id}`}
-                                    disabled={deleteMutation.isPending}
-                                  >
-                                    <Trash2 className="w-4 h-4 text-destructive" />
-                                  </Button>
-                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => deleteEntry(entry.id)}
+                                  data-testid={`button-delete-${entry.id}`}
+                                  disabled={deleteMutation.isPending}
+                                >
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
                               </td>
                             )}
                           </tr>
