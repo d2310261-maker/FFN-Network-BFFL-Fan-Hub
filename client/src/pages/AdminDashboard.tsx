@@ -79,27 +79,27 @@ export default function AdminDashboard() {
 
 function GamesManager() {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    week: 1,
-    homeTeam: "",
-    awayTeam: "",
-  });
+  const [week, setWeek] = useState(1);
+  const [gamesList, setGamesList] = useState<Array<{ homeTeam: string; awayTeam: string }>>([
+    { homeTeam: "", awayTeam: "" },
+  ]);
 
   const { data: games } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      await apiRequest("POST", "/api/games", data);
+    mutationFn: async (games: Array<{ week: number; homeTeam: string; awayTeam: string }>) => {
+      await Promise.all(games.map((game) => apiRequest("POST", "/api/games", game)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ predicate: (query) => {
         const key = query.queryKey;
         return typeof key[0] === 'string' && key[0]?.startsWith('/api/games');
       }});
-      toast({ title: "Success", description: "Game added successfully" });
-      setFormData({ week: 1, homeTeam: "", awayTeam: "" });
+      toast({ title: "Success", description: "Week scheduled successfully" });
+      setGamesList([{ homeTeam: "", awayTeam: "" }]);
+      setWeek(1);
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -111,7 +111,7 @@ function GamesManager() {
         setTimeout(() => window.location.href = "/api/login", 500);
         return;
       }
-      toast({ title: "Error", description: "Failed to add game", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to schedule week", variant: "destructive" });
     },
   });
 
@@ -142,54 +142,104 @@ function GamesManager() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    const validGames = gamesList.filter((g) => g.homeTeam.trim() && g.awayTeam.trim());
+    if (validGames.length === 0) {
+      toast({ title: "Error", description: "Add at least one game", variant: "destructive" });
+      return;
+    }
+    createMutation.mutate(validGames.map((g) => ({ week, ...g })));
+  };
+
+  const handleGameChange = (index: number, field: "homeTeam" | "awayTeam", value: string) => {
+    const updated = [...gamesList];
+    updated[index] = { ...updated[index], [field]: value };
+    setGamesList(updated);
+  };
+
+  const addGameRow = () => {
+    setGamesList([...gamesList, { homeTeam: "", awayTeam: "" }]);
+  };
+
+  const removeGameRow = (index: number) => {
+    setGamesList(gamesList.filter((_, i) => i !== index));
   };
 
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Add New Game</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="week">Week</Label>
-              <Input
-                id="week"
-                type="number"
-                min="1"
-                max="18"
-                value={formData.week}
-                onChange={(e) => setFormData({ ...formData, week: parseInt(e.target.value) })}
-                required
-                data-testid="input-week"
-              />
-            </div>
-            <div>
-              <Label htmlFor="awayTeam">Away Team</Label>
-              <Input
-                id="awayTeam"
-                value={formData.awayTeam}
-                onChange={(e) => setFormData({ ...formData, awayTeam: e.target.value })}
-                required
-                data-testid="input-away-team"
-              />
-            </div>
-          </div>
-
+        <h2 className="text-2xl font-bold mb-4">Schedule Week</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="homeTeam">Home Team</Label>
+            <Label htmlFor="week">Week</Label>
             <Input
-              id="homeTeam"
-              value={formData.homeTeam}
-              onChange={(e) => setFormData({ ...formData, homeTeam: e.target.value })}
+              id="week"
+              type="number"
+              min="1"
+              max="18"
+              value={week}
+              onChange={(e) => setWeek(parseInt(e.target.value))}
               required
-              data-testid="input-home-team"
+              data-testid="input-week"
             />
           </div>
 
-          <Button type="submit" className="gap-2" disabled={createMutation.isPending} data-testid="button-add-game">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-lg font-semibold">Games</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addGameRow}
+                className="gap-2"
+                data-testid="button-add-game-row"
+              >
+                <Plus className="w-4 h-4" />
+                Add Game
+              </Button>
+            </div>
+
+            {gamesList.map((game, index) => (
+              <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 border rounded-md bg-muted/30" data-testid={`game-row-${index}`}>
+                <div>
+                  <Label htmlFor={`away-${index}`}>Away Team</Label>
+                  <Input
+                    id={`away-${index}`}
+                    value={game.awayTeam}
+                    onChange={(e) => handleGameChange(index, "awayTeam", e.target.value)}
+                    placeholder="Away team"
+                    data-testid={`input-away-team-${index}`}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`home-${index}`}>Home Team</Label>
+                  <Input
+                    id={`home-${index}`}
+                    value={game.homeTeam}
+                    onChange={(e) => handleGameChange(index, "homeTeam", e.target.value)}
+                    placeholder="Home team"
+                    data-testid={`input-home-team-${index}`}
+                  />
+                </div>
+                {gamesList.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeGameRow(index)}
+                    className="md:col-span-2 justify-self-end"
+                    data-testid={`button-remove-game-${index}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <Button type="submit" className="gap-2 w-full" disabled={createMutation.isPending} data-testid="button-schedule-week">
             <Plus className="w-4 h-4" />
-            {createMutation.isPending ? "Adding..." : "Add Game"}
+            {createMutation.isPending ? "Scheduling..." : `Schedule Week ${week}`}
           </Button>
         </form>
       </Card>
