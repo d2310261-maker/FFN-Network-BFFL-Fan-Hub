@@ -111,7 +111,7 @@ export default function GameDetail() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <Link href="/">
+      <Link href="/scores">
         <Button variant="ghost" className="mb-6 gap-2" data-testid="button-back">
           <ArrowLeft className="w-4 h-4" />
           Back to Scores
