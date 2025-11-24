@@ -118,6 +118,7 @@ function GamesManager() {
           week: game.week,
           team1: game.team1,
           team2: game.team2,
+          gameTime: null,
         };
         if (game.date && game.time) {
           const gameTime = new Date(`${game.date}T${game.time}`);

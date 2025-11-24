@@ -46,7 +46,7 @@ export const games = pgTable("games", {
   team1Score: integer("team1_score").default(0),
   team2Score: integer("team2_score").default(0),
   quarter: varchar("quarter", { length: 20 }).default("Scheduled"), // "Q1", "Q2", "Q3", "Q4", "FINAL", "Scheduled"
-  gameTime: timestamp("game_time").defaultNow(),
+  gameTime: timestamp("game_time"),
   location: varchar("location", { length: 200 }),
   isFinal: boolean("is_final").default(false),
   isLive: boolean("is_live").default(false),
