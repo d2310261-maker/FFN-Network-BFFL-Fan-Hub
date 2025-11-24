@@ -45,7 +45,7 @@ export default function Standings() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
-  const [editingIds, setEditingIds] = useState<Set<string>>(new Set());
+  const [editingIds, setEditingIds] = useState<string[]>([]);
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"D1" | "D2" | "D3" | "D4">("D1");
 
@@ -122,8 +122,8 @@ export default function Standings() {
       entry.id === id ? { ...entry, [field]: value } : entry
     );
     setStandings(updated);
-    if (!editingIds.has(id)) {
-      setEditingIds(new Set([...editingIds, id]));
+    if (!editingIds.includes(id)) {
+      setEditingIds([...editingIds, id]);
     }
   };
 
@@ -131,7 +131,7 @@ export default function Standings() {
     const entry = standings.find(e => e.id === id);
     if (entry) {
       upsertMutation.mutate(entry);
-      setEditingIds(new Set([...editingIds].filter(eid => eid !== id)));
+      setEditingIds(editingIds.filter(eid => eid !== id));
     }
   };
 
@@ -286,7 +286,7 @@ export default function Standings() {
                             </td>
                             {isAuthenticated && (
                               <td className="px-6 py-4 text-sm text-center flex gap-2 justify-center">
-                                {editingIds.has(entry.id) && (
+                                {editingIds.includes(entry.id) && (
                                   <Button
                                     variant="ghost"
                                     size="icon"
