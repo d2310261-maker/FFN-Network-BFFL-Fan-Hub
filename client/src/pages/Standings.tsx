@@ -50,7 +50,6 @@ export default function Standings() {
 
   const { data: dbStandings, isLoading } = useQuery({
     queryKey: ["/api/standings"],
-    enabled: isAuthenticated,
   });
 
   useEffect(() => {
