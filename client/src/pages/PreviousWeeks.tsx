@@ -15,7 +15,7 @@ export default function PreviousWeeks() {
     queryKey: ["/api/games/week", selectedWeek],
   });
 
-  const weeks = Array.from({ length: 18 }, (_, i) => i + 1);
+  const weeks = Array.from({ length: 10 }, (_, i) => i + 1);
 
   if (error) {
     return (
