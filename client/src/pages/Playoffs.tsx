@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BracketTeam {
   id: string;
@@ -18,18 +19,37 @@ interface BracketMatch {
   round: number;
 }
 
+const AVAILABLE_TEAMS = [
+  "Atlanta Falcons",
+  "Tampa Bay Buccaneers",
+  "Jacksonville Jaguars",
+  "Los Angeles Rams",
+  "Baltimore Ravens",
+  "Miami Dolphins",
+  "Chicago Bears",
+  "Houston Texans",
+  "New Orleans Saints",
+  "San Francisco 49ers",
+  "Kansas City Chiefs",
+  "Detroit Lions",
+  "Philadelphia Eagles",
+  "Arizona Cardinals",
+  "Dallas Cowboys",
+  "Buffalo Bills",
+];
+
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [bracket, setBracket] = useState<BracketMatch[]>([
-    // Wildcard Round (4 matches)
+    // Wildcard Round (4 matches - 8 teams)
     { id: "wc1", round: 1, team1: undefined, team2: undefined },
     { id: "wc2", round: 1, team1: undefined, team2: undefined },
     { id: "wc3", round: 1, team1: undefined, team2: undefined },
     { id: "wc4", round: 1, team1: undefined, team2: undefined },
-    // Divisional Round (2 matches)
+    // Divisional Round (2 matches - 4 teams, 2 from byes)
     { id: "div1", round: 2, team1: undefined, team2: undefined },
     { id: "div2", round: 2, team1: undefined, team2: undefined },
-    // Championship Round (1 match)
+    // Championship (1 match - 2 teams)
     { id: "final", round: 3, team1: undefined, team2: undefined },
   ]);
 
@@ -52,6 +72,11 @@ export default function Playoffs() {
     3: "Championship",
   };
 
+  const usedTeams = bracket
+    .flatMap((m) => [m.team1?.name, m.team2?.name])
+    .filter(Boolean) as string[];
+  const availableTeams = AVAILABLE_TEAMS.filter((t) => !usedTeams.includes(t));
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -60,7 +85,7 @@ export default function Playoffs() {
             Playoff Bracket
           </h1>
           <p className="text-muted-foreground text-lg">
-            BFFL Season 1 Playoff Bracket
+            BFFL Season 1 - 12 Team Playoff (4 divisions, top 3 per division)
           </p>
         </div>
 
@@ -82,29 +107,43 @@ export default function Playoffs() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[1, 2].map((teamNum) => {
                           const teamKey = teamNum === 1 ? "team1" : "team2";
-                          const team = match[teamKey as keyof BracketMatch] as
-                            | BracketTeam
-                            | undefined;
+                          const team = match[teamKey as keyof BracketMatch] as BracketTeam | undefined;
+                          const otherTeam = teamNum === 1 ? match.team2 : match.team1;
+
+                          const teamOptions = availableTeams.concat(team?.name || []).filter((t, i, arr) => arr.indexOf(t) === i);
+
                           return (
                             <div key={teamNum}>
                               <Label htmlFor={`${match.id}-team${teamNum}`}>
                                 Team {teamNum}
                               </Label>
-                              <Input
-                                id={`${match.id}-team${teamNum}`}
-                                value={team?.name || ""}
-                                onChange={(e) => {
-                                  const newTeam = e.target.value
-                                    ? {
-                                        id: `${match.id}-t${teamNum}`,
-                                        name: e.target.value,
-                                      }
-                                    : undefined;
-                                  updateMatch(match.id, teamKey, newTeam);
-                                }}
-                                placeholder={`Enter team name`}
-                                data-testid={`input-team-${match.id}-${teamNum}`}
-                              />
+                              {isAuthenticated ? (
+                                <Select
+                                  value={team?.name || ""}
+                                  onValueChange={(value) => {
+                                    const newTeam = value
+                                      ? { id: `${match.id}-t${teamNum}`, name: value }
+                                      : undefined;
+                                    updateMatch(match.id, teamKey, newTeam);
+                                  }}
+                                >
+                                  <SelectTrigger data-testid={`select-team-${match.id}-${teamNum}`}>
+                                    <SelectValue placeholder="Select team" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="">Clear</SelectItem>
+                                    {teamOptions.map((t) => (
+                                      <SelectItem key={t} value={t}>
+                                        {t}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <div className="px-3 py-2 border rounded-md bg-muted text-muted-foreground">
+                                  {team?.name || "TBD"}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -112,34 +151,46 @@ export default function Playoffs() {
                       {match.team1 && match.team2 && (
                         <div className="pt-3 border-t">
                           <Label className="mb-2 block">Winner</Label>
-                          <div className="flex gap-2">
-                            <Button
-                              variant={
-                                match.winner === match.team1.id ? "default" : "outline"
-                              }
-                              size="sm"
-                              onClick={() =>
-                                updateMatch(match.id, "winner", match.team1?.id)
-                              }
-                              className="flex-1"
-                              data-testid={`button-winner-${match.id}-1`}
-                            >
-                              {match.team1.name}
-                            </Button>
-                            <Button
-                              variant={
-                                match.winner === match.team2?.id ? "default" : "outline"
-                              }
-                              size="sm"
-                              onClick={() =>
-                                updateMatch(match.id, "winner", match.team2?.id)
-                              }
-                              className="flex-1"
-                              data-testid={`button-winner-${match.id}-2`}
-                            >
-                              {match.team2.name}
-                            </Button>
-                          </div>
+                          {isAuthenticated ? (
+                            <div className="flex gap-2">
+                              <Button
+                                variant={
+                                  match.winner === match.team1.id ? "default" : "outline"
+                                }
+                                size="sm"
+                                onClick={() =>
+                                  updateMatch(match.id, "winner", match.team1?.id)
+                                }
+                                className="flex-1"
+                                data-testid={`button-winner-${match.id}-1`}
+                              >
+                                {match.team1.name}
+                              </Button>
+                              <Button
+                                variant={
+                                  match.winner === match.team2?.id ? "default" : "outline"
+                                }
+                                size="sm"
+                                onClick={() =>
+                                  updateMatch(match.id, "winner", match.team2?.id)
+                                }
+                                className="flex-1"
+                                data-testid={`button-winner-${match.id}-2`}
+                              >
+                                {match.team2.name}
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="text-sm">
+                              {match.winner
+                                ? `Winner: ${
+                                    match.winner === match.team1.id
+                                      ? match.team1.name
+                                      : match.team2.name
+                                  }`
+                                : "No winner set"}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
