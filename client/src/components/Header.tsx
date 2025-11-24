@@ -60,7 +60,7 @@ export function Header() {
                 </Button>
               </a>
             ) : (
-              <a href="/api/login" data-testid="link-login">
+              <a href="/login" data-testid="link-login">
                 <Button variant="default" size="default">
                   Admin Login
                 </Button>
