@@ -3,7 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Game } from "@shared/schema";
-import { format, isFuture, isPast } from "date-fns";
+import { isFuture, isPast } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Calendar, MapPin, AlertCircle } from "lucide-react";
 
 export default function Schedule() {
@@ -99,7 +100,7 @@ export default function Schedule() {
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="w-4 h-4" />
                             <span data-testid={`text-datetime-${game.id}`}>
-                              {gameDate ? format(gameDate, "EEE, MMM d 'at' h:mm a 'EST'") : "Time TBD"}
+                              {gameDate ? formatInTimeZone(gameDate, "America/New_York", "EEE, MMM d 'at' h:mm a 'EST'") : "Time TBD"}
                             </span>
                           </div>
                           {game.location && (

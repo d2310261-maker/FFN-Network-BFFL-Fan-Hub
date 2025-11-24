@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChatComponent } from "@/components/ChatComponent";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Game, ChatMessage } from "@shared/schema";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect, useRef } from "react";
@@ -130,7 +130,7 @@ export default function GameDetail() {
                 {game.isLive ? "LIVE" : game.isFinal ? "FINAL" : game.quarter}
               </Badge>
               <span className="text-sm text-muted-foreground" data-testid="text-game-time">
-                {game.gameTime ? format(new Date(game.gameTime), "EEEE, MMMM d 'at' h:mm a 'EST'") : "Time TBD"}
+                {game.gameTime ? formatInTimeZone(new Date(game.gameTime), "America/New_York", "EEEE, MMMM d 'at' h:mm a 'EST'") : "Time TBD"}
               </span>
             </div>
 
