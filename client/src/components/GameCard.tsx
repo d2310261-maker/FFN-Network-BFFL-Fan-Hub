@@ -9,9 +9,6 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, onClick }: GameCardProps) {
-  const isScheduled = game.quarter === "Scheduled";
-  const showScores = !isScheduled;
-
   return (
     <Card
       className={`p-6 cursor-pointer hover-elevate active-elevate-2 ${game.isLive ? 'border-primary' : ''}`}
@@ -37,22 +34,18 @@ export function GameCard({ game, onClick }: GameCardProps) {
             <span className={`text-lg font-bold ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team2-${game.id}`}>
               {game.team2}
             </span>
-            {showScores && (
-              <span className={`text-5xl font-black tabular-nums ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team2-score-${game.id}`}>
-                {game.team2Score}
-              </span>
-            )}
+            <span className={`text-5xl font-black tabular-nums ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team2-score-${game.id}`}>
+              {game.team2Score}
+            </span>
           </div>
 
           <div className="flex items-center justify-between">
             <span className={`text-lg font-bold ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team1-${game.id}`}>
               {game.team1}
             </span>
-            {showScores && (
-              <span className={`text-5xl font-black tabular-nums ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team1-score-${game.id}`}>
-                {game.team1Score}
-              </span>
-            )}
+            <span className={`text-5xl font-black tabular-nums ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid={`text-team1-score-${game.id}`}>
+              {game.team1Score}
+            </span>
           </div>
         </div>
 
