@@ -15,6 +15,7 @@ import Standings from "@/pages/Standings";
 import News from "@/pages/News";
 import Pickems from "@/pages/Pickems";
 import AdminDashboard from "@/pages/AdminDashboard";
+import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,6 +31,7 @@ function Router() {
       
       <Switch>
         <Route path="/" component={Landing} />
+        <Route path="/login" component={Login} />
         <Route path="/scores" component={LiveScores} />
         <Route path="/game/:id" component={GameDetail} />
         <Route path="/previous-weeks" component={PreviousWeeks} />
