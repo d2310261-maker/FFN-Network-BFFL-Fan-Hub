@@ -1,7 +1,6 @@
 import * as schema from "@shared/schema";
-import { drizzle as drizzleServerless } from 'drizzle-orm/neon-serverless';
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -9,8 +8,7 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Use Neon serverless for both development and production
-// This works with Render's PostgreSQL as well via connection pooling
-neonConfig.webSocketConstructor = ws;
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzleServerless({ client: pool, schema });
+// Use postgres-js driver for both dev and production
+// It works with both Neon and standard PostgreSQL connections
+const sql = postgres(process.env.DATABASE_URL);
+export const db = drizzle({ client: sql, schema });
