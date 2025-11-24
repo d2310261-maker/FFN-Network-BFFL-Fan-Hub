@@ -8,6 +8,9 @@ import express, {
 } from "express";
 
 import { registerRoutes } from "./routes";
+import { db } from "./db";
+import { games, news, chatMessages, pickems, pickemRules, standings, sessions } from "@shared/schema";
+import { sql } from "drizzle-orm";
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -67,6 +70,118 @@ app.use((req, res, next) => {
 export default async function runApp(
   setup: (app: Express, server: Server) => Promise<void>,
 ) {
+  // Auto-initialize database schema if tables don't exist (for Render compatibility)
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Initializing database schema...');
+      
+      // Create sessions table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS sessions (
+          sid VARCHAR PRIMARY KEY,
+          sess JSONB NOT NULL,
+          expire TIMESTAMP NOT NULL
+        )
+      `);
+      
+      // Create users table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          email VARCHAR UNIQUE,
+          first_name VARCHAR,
+          last_name VARCHAR,
+          profile_image_url VARCHAR,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create games table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS games (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          week INTEGER NOT NULL,
+          team1 VARCHAR(100) NOT NULL,
+          team2 VARCHAR(100) NOT NULL,
+          team1_score INTEGER DEFAULT 0,
+          team2_score INTEGER DEFAULT 0,
+          quarter VARCHAR(20) DEFAULT 'Scheduled',
+          game_time TIMESTAMP,
+          location VARCHAR(200),
+          is_final BOOLEAN DEFAULT false,
+          is_live BOOLEAN DEFAULT false,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create news table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS news (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          title VARCHAR(300) NOT NULL,
+          content TEXT NOT NULL,
+          excerpt TEXT,
+          author_id VARCHAR NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create chat_messages table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS chat_messages (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          username VARCHAR(100) NOT NULL,
+          message TEXT NOT NULL,
+          game_id VARCHAR,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create pickems table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS pickems (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          week INTEGER NOT NULL UNIQUE,
+          pickem_url TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create pickem_rules table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS pickem_rules (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          content TEXT NOT NULL,
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create standings table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS standings (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          team VARCHAR(100) NOT NULL,
+          division VARCHAR(10) NOT NULL,
+          wins INTEGER DEFAULT 0,
+          losses INTEGER DEFAULT 0,
+          ties INTEGER DEFAULT 0,
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      console.log('Database schema initialized successfully');
+    }
+  } catch (error: any) {
+    // Tables may already exist - that's fine
+    if (!error.message?.includes('already exists')) {
+      console.warn('Database initialization warning:', error.message);
+    }
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
