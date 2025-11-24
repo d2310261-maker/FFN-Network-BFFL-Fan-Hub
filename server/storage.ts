@@ -5,6 +5,7 @@ import {
   chatMessages,
   pickems,
   pickemRules,
+  standings,
   type User,
   type UpsertUser,
   type Game,
@@ -17,6 +18,8 @@ import {
   type InsertPickem,
   type PickemRules,
   type InsertPickemRules,
+  type Standings,
+  type InsertStandings,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -47,6 +50,10 @@ export interface IStorage {
   
   getPickemRules(): Promise<PickemRules | undefined>;
   upsertPickemRules(rules: InsertPickemRules): Promise<PickemRules>;
+  
+  getAllStandings(): Promise<Standings[]>;
+  upsertStandings(standing: InsertStandings): Promise<Standings>;
+  deleteStandings(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {

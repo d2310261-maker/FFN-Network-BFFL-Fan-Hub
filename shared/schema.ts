@@ -133,3 +133,22 @@ export const insertPickemRulesSchema = createInsertSchema(pickemRules).omit({
 
 export type InsertPickemRules = z.infer<typeof insertPickemRulesSchema>;
 export type PickemRules = typeof pickemRules.$inferSelect;
+
+// Standings table
+export const standings = pgTable("standings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  team: varchar("team", { length: 100 }).notNull(),
+  division: varchar("division", { length: 10 }).notNull(),
+  wins: integer("wins").default(0),
+  losses: integer("losses").default(0),
+  ties: integer("ties").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertStandingsSchema = createInsertSchema(standings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type InsertStandings = z.infer<typeof insertStandingsSchema>;
+export type Standings = typeof standings.$inferSelect;
