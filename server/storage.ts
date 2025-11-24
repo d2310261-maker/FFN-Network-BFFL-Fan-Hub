@@ -192,6 +192,33 @@ export class DatabaseStorage implements IStorage {
     const [created] = await db.insert(pickemRules).values(rulesData).returning();
     return created;
   }
+
+  async getAllStandings(): Promise<Standings[]> {
+    return await db.select().from(standings).orderBy(standings.division);
+  }
+
+  async upsertStandings(standingData: InsertStandings): Promise<Standings> {
+    const existing = await db
+      .select()
+      .from(standings)
+      .where(and(eq(standings.team, standingData.team), eq(standings.division, standingData.division)));
+    
+    if (existing.length > 0) {
+      const [updated] = await db
+        .update(standings)
+        .set({ ...standingData, updatedAt: new Date() })
+        .where(eq(standings.id, existing[0].id))
+        .returning();
+      return updated;
+    }
+
+    const [created] = await db.insert(standings).values(standingData).returning();
+    return created;
+  }
+
+  async deleteStandings(id: string): Promise<void> {
+    await db.delete(standings).where(eq(standings.id, id));
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,9 +43,61 @@ const DIVISIONS = ["D1", "D2", "D3", "D4"] as const;
 
 export default function Standings() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"D1" | "D2" | "D3" | "D4">("D1");
+
+  const { data: dbStandings, isLoading } = useQuery({
+    queryKey: ["/api/standings"],
+    enabled: isAuthenticated,
+  });
+
+  useEffect(() => {
+    if (dbStandings) {
+      setStandings(
+        dbStandings.map((s: any) => ({
+          id: s.id,
+          rank: 0,
+          team: s.team,
+          wins: s.wins,
+          losses: s.losses,
+          ties: s.ties,
+          division: s.division,
+        }))
+      );
+    }
+  }, [dbStandings]);
+
+  const upsertMutation = useMutation({
+    mutationFn: async (entry: StandingsEntry) => {
+      await apiRequest("POST", "/api/standings", {
+        team: entry.team,
+        division: entry.division,
+        wins: entry.wins,
+        losses: entry.losses,
+        ties: entry.ties,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to save standing", variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/standings/${id}`, undefined);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/standings"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete standing", variant: "destructive" });
+    },
+  });
 
   const addTeam = () => {
     if (!isAuthenticated || !newTeam.trim()) return;
@@ -56,21 +111,26 @@ export default function Standings() {
       division: newDivision,
     };
     setStandings([...standings, newEntry]);
+    upsertMutation.mutate(newEntry);
     setNewTeam("");
   };
 
   const updateEntry = (id: string, field: string, value: any) => {
     if (!isAuthenticated) return;
-    setStandings(
-      standings.map((entry) =>
-        entry.id === id ? { ...entry, [field]: value } : entry
-      )
+    const updated = standings.map((entry) =>
+      entry.id === id ? { ...entry, [field]: value } : entry
     );
+    setStandings(updated);
+    const entry = updated.find(e => e.id === id);
+    if (entry) {
+      upsertMutation.mutate(entry);
+    }
   };
 
   const deleteEntry = (id: string) => {
     if (!isAuthenticated) return;
     setStandings(standings.filter((entry) => entry.id !== id));
+    deleteMutation.mutate(id);
   };
 
   const getDivisionStandings = (division: string) => {

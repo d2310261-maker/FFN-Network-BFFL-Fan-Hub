@@ -12,9 +12,29 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Game, News as NewsType, Pickem, PickemRules } from "@shared/schema";
 import { format } from "date-fns";
 import { Plus, Trash2, Edit, Save } from "lucide-react";
+
+const AVAILABLE_TEAMS = [
+  "Atlanta Falcons",
+  "Tampa Bay Buccaneers",
+  "Jacksonville Jaguars",
+  "Los Angeles Rams",
+  "Baltimore Ravens",
+  "Miami Dolphins",
+  "Chicago Bears",
+  "Houston Texans",
+  "New Orleans Saints",
+  "San Francisco 49ers",
+  "Kansas City Chiefs",
+  "Detroit Lions",
+  "Philadelphia Eagles",
+  "Arizona Cardinals",
+  "Dallas Cowboys",
+  "Buffalo Bills",
+];
 
 export default function AdminDashboard() {
   const { toast } = useToast();
@@ -199,27 +219,40 @@ function GamesManager() {
               </Button>
             </div>
 
-            {gamesList.map((game, index) => (
+            {gamesList.map((game, index) => {
+              const usedTeams = gamesList.map(g => g.team1).concat(gamesList.map(g => g.team2)).filter(t => t && (t !== game.team1 || t === game.team1) && (t !== game.team2 || t === game.team2));
+              const availableTeams = AVAILABLE_TEAMS.filter(t => !usedTeams.includes(t) || t === game.team1 || t === game.team2);
+              return (
               <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 border rounded-md bg-muted/30" data-testid={`game-row-${index}`}>
                 <div>
                   <Label htmlFor={`team2-${index}`}>Team 2</Label>
-                  <Input
-                    id={`team2-${index}`}
-                    value={game.team2}
-                    onChange={(e) => handleGameChange(index, "team2", e.target.value)}
-                    placeholder="Team 2"
-                    data-testid={`input-team2-${index}`}
-                  />
+                  <Select value={game.team2} onValueChange={(value) => handleGameChange(index, "team2", value)}>
+                    <SelectTrigger id={`team2-${index}`} data-testid={`select-team2-${index}`}>
+                      <SelectValue placeholder="Select Team 2" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTeams.map((team) => (
+                        <SelectItem key={team} value={team}>
+                          {team}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor={`team1-${index}`}>Team 1</Label>
-                  <Input
-                    id={`team1-${index}`}
-                    value={game.team1}
-                    onChange={(e) => handleGameChange(index, "team1", e.target.value)}
-                    placeholder="Team 1"
-                    data-testid={`input-team1-${index}`}
-                  />
+                  <Select value={game.team1} onValueChange={(value) => handleGameChange(index, "team1", value)}>
+                    <SelectTrigger id={`team1-${index}`} data-testid={`select-team1-${index}`}>
+                      <SelectValue placeholder="Select Team 1" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTeams.map((team) => (
+                        <SelectItem key={team} value={team}>
+                          {team}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 {gamesList.length > 1 && (
                   <Button
@@ -234,7 +267,8 @@ function GamesManager() {
                   </Button>
                 )}
               </div>
-            ))}
+            );
+            })}
           </div>
 
           <Button type="submit" className="gap-2 w-full" disabled={createMutation.isPending} data-testid="button-schedule-week">

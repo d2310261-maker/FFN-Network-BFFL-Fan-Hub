@@ -9,6 +9,7 @@ import {
   insertChatMessageSchema,
   insertPickemSchema,
   insertPickemRulesSchema,
+  insertStandingsSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -190,6 +191,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating pickem rules:", error);
       res.status(400).json({ message: "Failed to update rules" });
+    }
+  });
+
+  app.get("/api/standings", async (req, res) => {
+    try {
+      const standings = await storage.getAllStandings();
+      res.json(standings);
+    } catch (error) {
+      console.error("Error fetching standings:", error);
+      res.status(500).json({ message: "Failed to fetch standings" });
+    }
+  });
+
+  app.post("/api/standings", isAuthenticated, async (req, res) => {
+    try {
+      const standingData = insertStandingsSchema.parse(req.body);
+      const standing = await storage.upsertStandings(standingData);
+      res.json(standing);
+    } catch (error) {
+      console.error("Error upserting standing:", error);
+      res.status(400).json({ message: "Failed to save standing" });
+    }
+  });
+
+  app.delete("/api/standings/:id", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteStandings(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting standing:", error);
+      res.status(400).json({ message: "Failed to delete standing" });
     }
   });
 
