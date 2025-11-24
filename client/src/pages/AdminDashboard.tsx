@@ -415,10 +415,8 @@ function GamesManager() {
                       size="icon"
                       onClick={() => {
                         setEditingGameId(game.id);
-                        const date = game.gameTime.split('T')[0];
-                        const time = game.gameTime.split('T')[1]?.slice(0, 5) || "";
-                        setEditDate(date);
-                        setEditTime(time);
+                        setEditDate("");
+                        setEditTime("");
                       }}
                       data-testid={`button-edit-time-${game.id}`}
                     >
