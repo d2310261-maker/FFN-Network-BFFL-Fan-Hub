@@ -38,7 +38,7 @@ export default function Landing() {
             Your ultimate destination for live scores, real-time discussion, and everything NFL
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button size="lg" onClick={() => setLocation("/")} className="gap-2" data-testid="button-view-scores">
+            <Button size="lg" onClick={() => setLocation("/scores")} className="gap-2" data-testid="button-view-scores">
               <Trophy className="w-5 h-5" />
               Live Scores
             </Button>
@@ -57,7 +57,7 @@ export default function Landing() {
               </h2>
               <p className="text-muted-foreground">Follow all the action this week</p>
             </div>
-            <Button variant="outline" onClick={() => setLocation("/")} className="gap-2">
+            <Button variant="outline" onClick={() => setLocation("/scores")} className="gap-2">
               View All <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -142,7 +142,7 @@ export default function Landing() {
               <p className="text-muted-foreground mb-4">
                 Follow every game with real-time score updates and live status indicators
               </p>
-              <Button variant="ghost" size="sm" onClick={() => setLocation("/")} className="gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setLocation("/scores")} className="gap-2">
                 View <ArrowRight className="w-4 h-4" />
               </Button>
             </Card>

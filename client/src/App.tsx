@@ -27,7 +27,8 @@ function Router() {
       <Header />
       
       <Switch>
-        <Route path="/" component={LiveScores} />
+        <Route path="/" component={Landing} />
+        <Route path="/scores" component={LiveScores} />
         <Route path="/game/:id" component={GameDetail} />
         <Route path="/previous-weeks" component={PreviousWeeks} />
         <Route path="/schedule" component={Schedule} />
