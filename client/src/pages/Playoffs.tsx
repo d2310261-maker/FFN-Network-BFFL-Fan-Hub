@@ -133,16 +133,16 @@ export default function Playoffs() {
       </div>
 
       <div className="flex justify-center overflow-x-auto px-4">
-        <div className="flex gap-12 items-center min-w-max">
+        <div className="flex gap-20 items-center min-w-max">
           {/* LEFT SIDE - Outside to Inside */}
-          <div className="flex gap-8">
+          <div className="flex gap-16">
             {/* Round 1 - Outermost */}
-            <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-32">
               {getMatches(1, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
             {/* Round 2 */}
-            <div className="flex flex-col gap-20 justify-center">
+            <div className="flex flex-col gap-40 justify-center">
               {getMatches(2, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
@@ -159,19 +159,19 @@ export default function Playoffs() {
           </div>
 
           {/* RIGHT SIDE - Outside to Inside */}
-          <div className="flex gap-8">
+          <div className="flex gap-16">
             {/* Round 3 - Innermost */}
             <div className="flex flex-col justify-center">
               {getMatches(3, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
             {/* Round 2 */}
-            <div className="flex flex-col gap-20 justify-center">
+            <div className="flex flex-col gap-40 justify-center">
               {getMatches(2, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
             {/* Round 1 - Outermost */}
-            <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-32">
               {getMatches(1, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
           </div>
