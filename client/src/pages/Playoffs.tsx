@@ -70,52 +70,49 @@ export default function Playoffs() {
   };
 
   const MatchCard = ({ match }: { match: BracketMatch }) => (
-    <div className="bg-card border border-border rounded w-40 text-xs" data-testid={`card-match-${match.id}`}>
-      <div className="p-2 space-y-1">
-        <div>
-          {isAuthenticated ? (
-            <Input
-              list={`teams-${match.id}-1`}
-              value={match.team1?.name || ""}
-              onChange={(e) => {
-                updateMatch(match.id, "team1", e.target.value ? { id: `${match.id}-t1`, name: e.target.value } : undefined);
-              }}
-              placeholder="Team"
-              className="text-xs h-7"
-              data-testid={`input-team1-${match.id}`}
-            />
-          ) : (
-            <div className="font-medium text-xs px-2 py-1">{match.team1?.name || "TBD"}</div>
-          )}
-          <datalist id={`teams-${match.id}-1`}>
-            {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
-          </datalist>
-        </div>
-        <div className="h-px bg-border" />
-        <div>
-          {isAuthenticated ? (
-            <Input
-              list={`teams-${match.id}-2`}
-              value={match.team2?.name || ""}
-              onChange={(e) => {
-                updateMatch(match.id, "team2", e.target.value ? { id: `${match.id}-t2`, name: e.target.value } : undefined);
-              }}
-              placeholder="Team"
-              className="text-xs h-7"
-              data-testid={`input-team2-${match.id}`}
-            />
-          ) : (
-            <div className="font-medium text-xs px-2 py-1">{match.team2?.name || "TBD"}</div>
-          )}
-          <datalist id={`teams-${match.id}-2`}>
-            {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
-          </datalist>
-        </div>
+    <div className="flex flex-col gap-1" data-testid={`card-match-${match.id}`}>
+      <div className="border border-border bg-card px-3 py-1 min-w-32 text-xs font-medium" data-testid={`team1-${match.id}`}>
+        {isAuthenticated ? (
+          <input
+            list={`teams-${match.id}-1`}
+            value={match.team1?.name || ""}
+            onChange={(e) => {
+              updateMatch(match.id, "team1", e.target.value ? { id: `${match.id}-t1`, name: e.target.value } : undefined);
+            }}
+            placeholder="Team"
+            className="w-full bg-transparent border-0 text-xs focus:outline-none"
+            data-testid={`input-team1-${match.id}`}
+          />
+        ) : (
+          <span>{match.team1?.name || "TBD"}</span>
+        )}
+        <datalist id={`teams-${match.id}-1`}>
+          {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
+        </datalist>
+      </div>
+      <div className="border border-border bg-card px-3 py-1 min-w-32 text-xs font-medium" data-testid={`team2-${match.id}`}>
+        {isAuthenticated ? (
+          <input
+            list={`teams-${match.id}-2`}
+            value={match.team2?.name || ""}
+            onChange={(e) => {
+              updateMatch(match.id, "team2", e.target.value ? { id: `${match.id}-t2`, name: e.target.value } : undefined);
+            }}
+            placeholder="Team"
+            className="w-full bg-transparent border-0 text-xs focus:outline-none"
+            data-testid={`input-team2-${match.id}`}
+          />
+        ) : (
+          <span>{match.team2?.name || "TBD"}</span>
+        )}
+        <datalist id={`teams-${match.id}-2`}>
+          {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
+        </datalist>
       </div>
       {isAuthenticated && match.team1 && match.team2 && (
-        <div className="flex gap-0.5 p-1 border-t">
-          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-6 text-xs" data-testid={`button-winner1-${match.id}`}>W</Button>
-          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-6 text-xs" data-testid={`button-winner2-${match.id}`}>W</Button>
+        <div className="flex gap-1 mt-1">
+          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-5 text-xs" data-testid={`button-winner1-${match.id}`}>W</Button>
+          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-5 text-xs" data-testid={`button-winner2-${match.id}`}>W</Button>
         </div>
       )}
     </div>
