@@ -69,7 +69,7 @@ export default function News() {
                     {post.excerpt}
                   </p>
                 )}
-                <div className="prose prose-sm max-w-none line-clamp-4" data-testid={`text-content-${post.id}`}>
+                <div className="prose prose-sm max-w-none line-clamp-4 dark:text-white dark:prose-invert" data-testid={`text-content-${post.id}`}>
                   {post.content}
                 </div>
               </div>
