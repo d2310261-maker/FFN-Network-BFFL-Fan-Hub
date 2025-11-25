@@ -659,11 +659,8 @@ function NewsManager() {
       toast({ title: "Error", description: "Content is required", variant: "destructive" });
       return;
     }
-    if (!user?.id) {
-      toast({ title: "Error", description: "User not authenticated", variant: "destructive" });
-      return;
-    }
-    createMutation.mutate({ ...formData, authorId: user.id });
+    const authorId = user?.id || "anonymous";
+    createMutation.mutate({ ...formData, authorId });
   };
 
   return (
