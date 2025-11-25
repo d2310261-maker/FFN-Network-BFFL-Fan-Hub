@@ -175,8 +175,8 @@ export default function Playoffs() {
   };
 
   const MatchCard = ({ match }: { match: BracketMatch }) => (
-    <div className="flex flex-col gap-1" data-testid={`card-match-${match.id}`}>
-      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team1-${match.id}`}>
+    <div className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
+      <div className="border border-border bg-card px-2 py-0.5 min-w-24 md:min-w-36 text-xs md:text-xs font-medium overflow-hidden" data-testid={`team1-${match.id}`}>
         {isAuthenticated ? (
           <Select value={match.team1?.name || ""} onValueChange={(value) => {
             updateMatch(match.id, "team1", value ? { id: `${match.id}-t1`, name: value } : undefined);
@@ -191,10 +191,10 @@ export default function Playoffs() {
             </SelectContent>
           </Select>
         ) : (
-          <span>{match.team1?.name || "TBD"}</span>
+          <span className="truncate text-2xs md:text-xs">{match.team1?.name || "TBD"}</span>
         )}
       </div>
-      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team2-${match.id}`}>
+      <div className="border border-border bg-card px-2 py-0.5 min-w-24 md:min-w-36 text-xs md:text-xs font-medium overflow-hidden" data-testid={`team2-${match.id}`}>
         {isAuthenticated ? (
           <Select value={match.team2?.name || ""} onValueChange={(value) => {
             updateMatch(match.id, "team2", value ? { id: `${match.id}-t2`, name: value } : undefined);
@@ -209,13 +209,13 @@ export default function Playoffs() {
             </SelectContent>
           </Select>
         ) : (
-          <span>{match.team2?.name || "TBD"}</span>
+          <span className="truncate text-2xs md:text-xs">{match.team2?.name || "TBD"}</span>
         )}
       </div>
       {isAuthenticated && match.team1 && match.team2 && (
-        <div className="flex gap-1 mt-0.5">
-          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-5 text-xs px-1" data-testid={`button-winner1-${match.id}`}>W</Button>
-          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-5 text-xs px-1" data-testid={`button-winner2-${match.id}`}>W</Button>
+        <div className="flex gap-0.5 mt-0.5">
+          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-4 text-xs px-0.5" data-testid={`button-winner1-${match.id}`}>W</Button>
+          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-4 text-xs px-0.5" data-testid={`button-winner2-${match.id}`}>W</Button>
         </div>
       )}
     </div>
@@ -240,43 +240,43 @@ export default function Playoffs() {
           </Button>
         )}
       </div>
-      <div className="flex justify-center overflow-x-auto px-4">
-        <div className="flex gap-4 items-center min-w-max">
-          <div className="flex gap-2">
-            <div className="flex flex-col gap-32">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">WILDCARD</div>
+      <div className="flex justify-center overflow-x-auto px-2 md:px-4">
+        <div className="flex gap-1 md:gap-4 items-center min-w-max">
+          <div className="flex gap-1 md:gap-2">
+            <div className="flex flex-col gap-12 md:gap-32">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">WILDCARD</div>
               {getMatches(1, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
-            <div className="flex flex-col gap-40 justify-center">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">DIVISIONAL</div>
+            <div className="flex flex-col gap-16 md:gap-40 justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">DIVISIONAL</div>
               {getMatches(2, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
             <div className="flex flex-col justify-center">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">CONFERENCE</div>
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">CONFERENCE</div>
               {getMatches(3, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-6">
-            <div className="text-lg font-bold text-primary">SUPER BOWL</div>
+          <div className="flex flex-col items-center justify-center gap-2 md:gap-6">
+            <div className="text-sm md:text-lg font-bold text-primary">SUPER BOWL</div>
             {bracket.filter(m => m.id === "finals").map((m) => <MatchCard key={m.id} match={m} />)}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-1 md:gap-2">
             <div className="flex flex-col justify-center">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">CONFERENCE</div>
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">CONFERENCE</div>
               {getMatches(3, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
-            <div className="flex flex-col gap-40 justify-center">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">DIVISIONAL</div>
+            <div className="flex flex-col gap-16 md:gap-40 justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">DIVISIONAL</div>
               {getMatches(2, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
-            <div className="flex flex-col gap-32">
-              <div className="text-xs font-bold text-muted-foreground text-center mb-2">WILDCARD</div>
+            <div className="flex flex-col gap-12 md:gap-32">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-1 md:mb-2">WILDCARD</div>
               {getMatches(1, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
           </div>
