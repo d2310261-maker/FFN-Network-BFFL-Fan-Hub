@@ -240,8 +240,8 @@ export default function Playoffs() {
           </Button>
         )}
       </div>
-      <div className="flex justify-center overflow-x-auto px-0.5 md:px-4">
-        <div className="flex gap-0.5 md:gap-4 items-center min-w-max">
+      <div className="flex justify-start md:justify-center overflow-x-auto px-0.5 md:px-4">
+        <div className="flex gap-0.5 md:gap-4 items-center">
           <div className="flex gap-0.5 md:gap-2">
             <div className="flex flex-col gap-6 md:gap-32">
               <div className="text-2xs md:text-xs font-bold text-muted-foreground text-center mb-0 md:mb-2">WC</div>
