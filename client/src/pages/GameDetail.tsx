@@ -42,9 +42,9 @@ export default function GameDetail() {
       const hostname = window.location.hostname;
       const port = window.location.port;
       
-      if (!hostname || !port || port === "undefined") return;
+      if (!hostname) return;
       
-      const wsUrl = `${protocol}//${hostname}:${port}/ws`;
+      const wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}/ws`;
       if (wsUrl.includes("undefined")) return;
       
       const socket = new WebSocket(wsUrl);

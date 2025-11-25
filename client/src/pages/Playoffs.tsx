@@ -19,18 +19,22 @@ interface BracketMatch {
 }
 
 const AVAILABLE_TEAMS = [
-  "Oregon",
-  "Missouri",
-  "Michigan",
-  "Alabama",
-  "Florida State",
-  "Liberty",
-  "Penn State",
-  "Ohio State",
-  "Washington",
-  "Texas",
-  "Georgia",
-  "Ole Miss",
+  "Atlanta Falcons",
+  "Tampa Bay Buccaneers",
+  "Jacksonville Jaguars",
+  "Los Angeles Rams",
+  "Baltimore Ravens",
+  "Miami Dolphins",
+  "Chicago Bears",
+  "Houston Texans",
+  "New Orleans Saints",
+  "San Francisco 49ers",
+  "Kansas City Chiefs",
+  "Detroit Lions",
+  "Philadelphia Eagles",
+  "Arizona Cardinals",
+  "Dallas Cowboys",
+  "Buffalo Bills",
 ];
 
 export default function Playoffs() {
