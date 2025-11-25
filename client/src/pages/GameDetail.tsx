@@ -40,12 +40,12 @@ export default function GameDetail() {
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const hostname = window.location.hostname;
-      const port = window.location.port;
+      const port = window.location.port || "";
       
       if (!hostname) return;
       
-      const wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}/ws`;
-      if (wsUrl.includes("undefined")) return;
+      const wsUrl = port && port !== "" && port !== "undefined" ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}/ws`;
+      if (wsUrl.includes("undefined") || wsUrl.includes("localhost:")) return;
       
       const socket = new WebSocket(wsUrl);
 

@@ -180,6 +180,8 @@ function GamesManager() {
       if (date && time) {
         const gameTime = new Date(`${date}T${time}`);
         await apiRequest("PATCH", `/api/games/${id}`, { gameTime: gameTime.toISOString() });
+      } else {
+        await apiRequest("PATCH", `/api/games/${id}`, { gameTime: null });
       }
     },
     onSuccess: () => {
