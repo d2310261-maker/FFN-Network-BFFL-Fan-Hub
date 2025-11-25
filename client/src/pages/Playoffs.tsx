@@ -133,23 +133,26 @@ export default function Playoffs() {
           <div className="flex gap-2">
             {/* Round 1 - Outermost */}
             <div className="flex flex-col gap-32">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">WILDCARD</div>
               {getMatches(1, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
             {/* Round 2 */}
             <div className="flex flex-col gap-40 justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">DIVISIONAL</div>
               {getMatches(2, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
             {/* Round 3 - Innermost */}
             <div className="flex flex-col justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">CONFERENCE</div>
               {getMatches(3, "left").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
           </div>
 
           {/* CENTER - FINALS */}
           <div className="flex flex-col items-center justify-center gap-6">
-            <div className="text-lg font-bold text-primary">FINALS</div>
+            <div className="text-lg font-bold text-primary">SUPER BOWL</div>
             {bracket.filter(m => m.id === "finals").map((m) => <MatchCard key={m.id} match={m} />)}
           </div>
 
@@ -157,16 +160,19 @@ export default function Playoffs() {
           <div className="flex gap-2">
             {/* Round 3 - Innermost */}
             <div className="flex flex-col justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">CONFERENCE</div>
               {getMatches(3, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
 
             {/* Round 2 */}
             <div className="flex flex-col gap-40 justify-center">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">DIVISIONAL</div>
               {getMatches(2, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
             
             {/* Round 1 - Outermost */}
             <div className="flex flex-col gap-32">
+              <div className="text-xs font-bold text-muted-foreground text-center mb-2">WILDCARD</div>
               {getMatches(1, "right").map((m) => <MatchCard key={m.id} match={m} />)}
             </div>
           </div>
