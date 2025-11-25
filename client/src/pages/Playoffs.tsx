@@ -81,7 +81,9 @@ export default function Playoffs() {
     const init = async () => {
       if (initialized) return;
       try {
-        await apiRequest("POST", "/api/playoffs/init");
+        if (isAuthenticated) {
+          await apiRequest("POST", "/api/playoffs/init");
+        }
         await refetchMatches();
         setInitialized(true);
       } catch (error) {
@@ -89,7 +91,7 @@ export default function Playoffs() {
       }
     };
     init();
-  }, [initialized, refetchMatches]);
+  }, [isAuthenticated, initialized, refetchMatches]);
 
   // Update bracket when dbMatches loads
   useEffect(() => {
@@ -224,17 +226,19 @@ export default function Playoffs() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold" data-testid="text-page-title">BFFL Playoff Bracket</h1>
         <p className="text-muted-foreground text-sm">12 Team Bracket</p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleReset}
-          className="mt-4 gap-2"
-          data-testid="button-reset-bracket"
-          disabled={resetMutation.isPending}
-        >
-          <RotateCcw className="w-4 h-4" />
-          Reset Bracket
-        </Button>
+        {isAuthenticated && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="mt-4 gap-2"
+            data-testid="button-reset-bracket"
+            disabled={resetMutation.isPending}
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset Bracket
+          </Button>
+        )}
       </div>
       <div className="flex justify-center overflow-x-auto px-4">
         <div className="flex gap-4 items-center min-w-max">
