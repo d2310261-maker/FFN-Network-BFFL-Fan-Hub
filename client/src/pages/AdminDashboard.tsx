@@ -704,7 +704,7 @@ function NewsManager() {
           {news?.map((post) => (
             <div key={post.id} className="flex items-start justify-between p-4 border rounded-md" data-testid={`news-item-${post.id}`}>
               <div className="flex-1">
-                <h3 className="font-semibold mb-1">{post.title}</h3>
+                <h3 className="font-semibold mb-1 dark:text-white">{post.title}</h3>
                 <p className="text-sm text-muted-foreground">
                   {format(new Date(post.createdAt!), "MMM d, yyyy")}
                 </p>
