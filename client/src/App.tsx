@@ -14,6 +14,7 @@ import Schedule from "@/pages/Schedule";
 import Playoffs from "@/pages/Playoffs";
 import Standings from "@/pages/Standings";
 import News from "@/pages/News";
+import NewsDetail from "@/pages/NewsDetail";
 import Pickems from "@/pages/Pickems";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Login from "@/pages/Login";
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/playoffs" component={Playoffs} />
         <Route path="/standings" component={Standings} />
         <Route path="/news" component={News} />
+        <Route path="/news/:id" component={NewsDetail} />
         <Route path="/pickems" component={Pickems} />
         {isAuthenticated && <Route path="/admin" component={AdminDashboard} />}
         <Route component={NotFound} />

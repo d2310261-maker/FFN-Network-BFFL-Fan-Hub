@@ -56,24 +56,26 @@ export default function News() {
       ) : news && news.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {news.map((post) => (
-            <Card key={post.id} className="p-6 flex flex-col hover-elevate active-elevate-2" data-testid={`card-news-${post.id}`}>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2 line-clamp-2 dark:!text-white" data-testid={`text-title-${post.id}`}>
-                  {post.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4" data-testid={`text-date-${post.id}`}>
-                  {format(new Date(post.createdAt!), "MMMM d, yyyy")}
-                </p>
-                {post.excerpt && (
-                  <p className="text-muted-foreground mb-4 line-clamp-3" data-testid={`text-excerpt-${post.id}`}>
-                    {post.excerpt}
+            <Link key={post.id} href={`/news/${post.id}`}>
+              <Card className="p-6 flex flex-col hover-elevate active-elevate-2 cursor-pointer h-full" data-testid={`card-news-${post.id}`}>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2 dark:!text-white" data-testid={`text-title-${post.id}`}>
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4" data-testid={`text-date-${post.id}`}>
+                    {format(new Date(post.createdAt!), "MMMM d, yyyy")}
                   </p>
-                )}
-                <div className="prose prose-sm max-w-none line-clamp-4 dark:text-white dark:prose-invert" data-testid={`text-content-${post.id}`}>
-                  {post.content}
+                  {post.excerpt && (
+                    <p className="text-muted-foreground mb-4 line-clamp-3" data-testid={`text-excerpt-${post.id}`}>
+                      {post.excerpt}
+                    </p>
+                  )}
+                  <div className="prose prose-sm max-w-none line-clamp-4 dark:text-white dark:prose-invert" data-testid={`text-content-${post.id}`}>
+                    {post.content}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
       ) : (
