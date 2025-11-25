@@ -115,6 +115,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/news/:id", async (req, res) => {
+    try {
+      const allNews = await storage.getAllNews();
+      const news = allNews.find(n => n.id === req.params.id);
+      if (!news) {
+        return res.status(404).json({ message: "News not found" });
+      }
+      res.json(news);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      res.status(500).json({ message: "Failed to fetch news" });
+    }
+  });
+
   app.post("/api/news", isAuthenticated, async (req, res) => {
     try {
       const newsData = insertNewsSchema.parse(req.body);
