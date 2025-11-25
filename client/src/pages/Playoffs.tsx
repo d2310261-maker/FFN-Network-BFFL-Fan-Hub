@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface BracketTeam {
   id: string;
@@ -14,6 +14,7 @@ interface BracketMatch {
   team2?: BracketTeam;
   winner?: string;
   round: number;
+  side: "left" | "right";
 }
 
 const AVAILABLE_TEAMS = [
@@ -38,21 +39,28 @@ const AVAILABLE_TEAMS = [
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [bracket, setBracket] = useState<BracketMatch[]>([
-    // Round 1 - Play-In (4 matches)
-    { id: "pi1", round: 1, team1: undefined, team2: undefined },
-    { id: "pi2", round: 1, team1: undefined, team2: undefined },
-    { id: "pi3", round: 1, team1: undefined, team2: undefined },
-    { id: "pi4", round: 1, team1: undefined, team2: undefined },
-    // Round 2 - Divisional (4 matches)
-    { id: "div1", round: 2, team1: undefined, team2: undefined },
-    { id: "div2", round: 2, team1: undefined, team2: undefined },
-    { id: "div3", round: 2, team1: undefined, team2: undefined },
-    { id: "div4", round: 2, team1: undefined, team2: undefined },
-    // Round 3 - Championship (2 matches)
-    { id: "conf1", round: 3, team1: undefined, team2: undefined },
-    { id: "conf2", round: 3, team1: undefined, team2: undefined },
-    // Round 4 - Super Bowl (1 match)
-    { id: "sb", round: 4, team1: undefined, team2: undefined },
+    // LEFT SIDE - 4 play-in matches
+    { id: "l_pi1", round: 1, side: "left", team1: undefined, team2: undefined },
+    { id: "l_pi2", round: 1, side: "left", team1: undefined, team2: undefined },
+    { id: "l_pi3", round: 1, side: "left", team1: undefined, team2: undefined },
+    { id: "l_pi4", round: 1, side: "left", team1: undefined, team2: undefined },
+    // LEFT SIDE - 2 divisional matches
+    { id: "l_div1", round: 2, side: "left", team1: undefined, team2: undefined },
+    { id: "l_div2", round: 2, side: "left", team1: undefined, team2: undefined },
+    // LEFT SIDE - 1 championship match
+    { id: "l_conf", round: 3, side: "left", team1: undefined, team2: undefined },
+    // RIGHT SIDE - 4 play-in matches
+    { id: "r_pi1", round: 1, side: "right", team1: undefined, team2: undefined },
+    { id: "r_pi2", round: 1, side: "right", team1: undefined, team2: undefined },
+    { id: "r_pi3", round: 1, side: "right", team1: undefined, team2: undefined },
+    { id: "r_pi4", round: 1, side: "right", team1: undefined, team2: undefined },
+    // RIGHT SIDE - 2 divisional matches
+    { id: "r_div1", round: 2, side: "right", team1: undefined, team2: undefined },
+    { id: "r_div2", round: 2, side: "right", team1: undefined, team2: undefined },
+    // RIGHT SIDE - 1 championship match
+    { id: "r_conf", round: 3, side: "right", team1: undefined, team2: undefined },
+    // SUPER BOWL
+    { id: "sb", round: 4, side: "left", team1: undefined, team2: undefined },
   ]);
 
   const updateMatch = (matchId: string, field: string, value: any) => {
@@ -64,133 +72,111 @@ export default function Playoffs() {
     );
   };
 
-  const getMatchesForRound = (round: number) => {
-    return bracket.filter((m) => m.round === round);
+  const getMatches = (round: number, side: "left" | "right") => {
+    return bracket.filter((m) => m.round === round && m.side === side);
   };
 
-  const roundNames: Record<number, string> = {
-    1: "Play-In",
-    2: "Divisional",
-    3: "Conference",
-    4: "Super Bowl",
-  };
-
-  const MatchBox = ({ match }: { match: BracketMatch }) => (
-    <div className="bg-card border border-border rounded p-3 w-48" data-testid={`card-match-${match.id}`}>
-      <div className="space-y-2">
+  const MatchCard = ({ match }: { match: BracketMatch }) => (
+    <div className="bg-card border border-border rounded w-40 text-xs" data-testid={`card-match-${match.id}`}>
+      <div className="p-2 space-y-1">
         <div>
           {isAuthenticated ? (
             <Input
               list={`teams-${match.id}-1`}
               value={match.team1?.name || ""}
               onChange={(e) => {
-                const newTeam = e.target.value
-                  ? { id: `${match.id}-t1`, name: e.target.value }
-                  : undefined;
-                updateMatch(match.id, "team1", newTeam);
+                updateMatch(match.id, "team1", e.target.value ? { id: `${match.id}-t1`, name: e.target.value } : undefined);
               }}
               placeholder="Team"
-              className="text-xs h-8"
+              className="text-xs h-7"
               data-testid={`input-team1-${match.id}`}
             />
           ) : (
-            <div className="text-sm font-medium truncate">{match.team1?.name || "TBD"}</div>
+            <div className="font-medium text-xs px-2 py-1">{match.team1?.name || "TBD"}</div>
           )}
           <datalist id={`teams-${match.id}-1`}>
             {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
           </datalist>
         </div>
-
         <div className="h-px bg-border" />
-
         <div>
           {isAuthenticated ? (
             <Input
               list={`teams-${match.id}-2`}
               value={match.team2?.name || ""}
               onChange={(e) => {
-                const newTeam = e.target.value
-                  ? { id: `${match.id}-t2`, name: e.target.value }
-                  : undefined;
-                updateMatch(match.id, "team2", newTeam);
+                updateMatch(match.id, "team2", e.target.value ? { id: `${match.id}-t2`, name: e.target.value } : undefined);
               }}
               placeholder="Team"
-              className="text-xs h-8"
+              className="text-xs h-7"
               data-testid={`input-team2-${match.id}`}
             />
           ) : (
-            <div className="text-sm font-medium truncate">{match.team2?.name || "TBD"}</div>
+            <div className="font-medium text-xs px-2 py-1">{match.team2?.name || "TBD"}</div>
           )}
           <datalist id={`teams-${match.id}-2`}>
             {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
           </datalist>
         </div>
       </div>
-
       {isAuthenticated && match.team1 && match.team2 && (
-        <div className="flex gap-1 mt-2 pt-2 border-t">
-          <Button
-            variant={match.winner === match.team1.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => updateMatch(match.id, "winner", match.team1?.id)}
-            className="flex-1 h-7 text-xs"
-            data-testid={`button-winner1-${match.id}`}
-          >
-            W
-          </Button>
-          <Button
-            variant={match.winner === match.team2?.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => updateMatch(match.id, "winner", match.team2?.id)}
-            className="flex-1 h-7 text-xs"
-            data-testid={`button-winner2-${match.id}`}
-          >
-            W
-          </Button>
+        <div className="flex gap-0.5 p-1 border-t">
+          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-6 text-xs" data-testid={`button-winner1-${match.id}`}>W</Button>
+          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-6 text-xs" data-testid={`button-winner2-${match.id}`}>W</Button>
         </div>
       )}
     </div>
   );
 
-  const RoundColumn = ({ round, title }: { round: number; title: string }) => {
-    const matches = getMatchesForRound(round);
-    const spacing = Math.pow(2, round - 1);
-
-    return (
-      <div className="flex flex-col items-center px-6">
-        <h3 className="text-sm font-bold mb-6 text-muted-foreground">{title}</h3>
-        <div className="flex flex-col justify-center gap-6">
-          {matches.map((match, idx) => (
-            <div
-              key={match.id}
-              style={{
-                marginTop: idx === 0 ? 0 : `${(spacing - 1) * 60}px`,
-              }}
-            >
-              <MatchBox match={match} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="px-4">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold" data-testid="text-page-title">
-            Playoff Bracket
-          </h1>
-          <p className="text-muted-foreground text-sm">BFFL Season 1 - 12 Team Playoff</p>
-        </div>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold" data-testid="text-page-title">Playoff Bracket</h1>
+        <p className="text-muted-foreground text-sm">BFFL Season 1 - 12 Team Playoff</p>
+      </div>
 
-        <div className="overflow-x-auto">
-          <div className="flex gap-4 min-w-max pb-8">
-            <RoundColumn round={1} title="Play-In" />
-            <RoundColumn round={2} title="Divisional" />
-            <RoundColumn round={3} title="Conference" />
-            <RoundColumn round={4} title="Super Bowl" />
+      <div className="flex justify-center overflow-x-auto px-4">
+        <div className="flex gap-12 items-center min-w-max">
+          {/* LEFT SIDE - Flows up */}
+          <div className="flex flex-col gap-8">
+            {/* Round 1 */}
+            <div className="flex flex-col gap-20">
+              {getMatches(1, "left").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
+            
+            {/* Round 2 */}
+            <div className="flex flex-col gap-32">
+              {getMatches(2, "left").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
+            
+            {/* Round 3 */}
+            <div className="flex flex-col justify-center">
+              {getMatches(3, "left").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
+          </div>
+
+          {/* CENTER - Super Bowl */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-xs font-bold text-muted-foreground">SUPER BOWL</div>
+            <MatchCard match={bracket.find(m => m.id === "sb")!} />
+          </div>
+
+          {/* RIGHT SIDE - Flows down */}
+          <div className="flex flex-col gap-8">
+            {/* Round 3 */}
+            <div className="flex flex-col justify-center">
+              {getMatches(3, "right").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
+            
+            {/* Round 2 */}
+            <div className="flex flex-col gap-32">
+              {getMatches(2, "right").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
+            
+            {/* Round 1 */}
+            <div className="flex flex-col gap-20">
+              {getMatches(1, "right").map((m) => <MatchCard key={m.id} match={m} />)}
+            </div>
           </div>
         </div>
       </div>
