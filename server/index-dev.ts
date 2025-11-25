@@ -11,9 +11,20 @@ import runApp from "./app";
 
 export async function setupVite(app: Express, server: Server) {
   const viteLogger = createLogger();
+  
+  // Determine HMR configuration based on environment
+  const isReplit = !!process.env.REPLIT_ID;
+  const hmrConfig = isReplit
+    ? {
+        protocol: "wss",
+        host: process.env.REPLIT_DOMAINS || "localhost",
+        port: 443,
+      }
+    : { server };
+  
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: hmrConfig,
     allowedHosts: true as const,
   };
 
