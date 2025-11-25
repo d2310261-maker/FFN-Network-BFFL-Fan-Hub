@@ -59,7 +59,7 @@ export const insertGameSchema = createInsertSchema(games).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  gameTime: z.coerce.date().optional(),
+  gameTime: z.union([z.string().datetime().transform(s => new Date(s)), z.null(), z.undefined()]).optional(),
 });
 
 export type InsertGame = z.infer<typeof insertGameSchema>;
