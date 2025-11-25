@@ -16,6 +16,7 @@ interface BracketMatch {
   team2?: BracketTeam;
   winner?: string;
   round: number;
+  side: "top" | "bottom";
 }
 
 const AVAILABLE_TEAMS = [
@@ -40,13 +41,19 @@ const AVAILABLE_TEAMS = [
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [bracket, setBracket] = useState<BracketMatch[]>([
-    { id: "wc1", round: 1, team1: undefined, team2: undefined },
-    { id: "wc2", round: 1, team1: undefined, team2: undefined },
-    { id: "wc3", round: 1, team1: undefined, team2: undefined },
-    { id: "wc4", round: 1, team1: undefined, team2: undefined },
-    { id: "div1", round: 2, team1: undefined, team2: undefined },
-    { id: "div2", round: 2, team1: undefined, team2: undefined },
-    { id: "final", round: 3, team1: undefined, team2: undefined },
+    // Top side (seeds 1-6)
+    { id: "wc1", round: 1, side: "top", team1: undefined, team2: undefined },
+    { id: "wc2", round: 1, side: "top", team1: undefined, team2: undefined },
+    { id: "div1", round: 2, side: "top", team1: undefined, team2: undefined },
+    // Bottom side (seeds 7-12)
+    { id: "wc3", round: 1, side: "bottom", team1: undefined, team2: undefined },
+    { id: "wc4", round: 1, side: "bottom", team1: undefined, team2: undefined },
+    { id: "div2", round: 2, side: "bottom", team1: undefined, team2: undefined },
+    // Conference Championship
+    { id: "conf1", round: 3, side: "top", team1: undefined, team2: undefined },
+    { id: "conf2", round: 3, side: "bottom", team1: undefined, team2: undefined },
+    // Super Bowl
+    { id: "superbowl", round: 4, side: "top", team1: undefined, team2: undefined },
   ]);
 
   const updateMatch = (matchId: string, field: string, value: any) => {
@@ -58,149 +65,223 @@ export default function Playoffs() {
     );
   };
 
-  const getMatchesForRound = (round: number) => {
-    return bracket.filter((m) => m.round === round);
-  };
-
-  const roundNames: Record<number, string> = {
-    1: "Wildcard",
-    2: "Divisional",
-    3: "Championship",
+  const getMatchesForRound = (round: number, side?: "top" | "bottom") => {
+    return bracket.filter((m) => m.round === round && (side ? m.side === side : true));
   };
 
   const usedTeams = bracket
     .flatMap((m) => [m.team1?.name, m.team2?.name])
     .filter(Boolean) as string[];
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
-            Playoff Bracket
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            BFFL Season 1 - 12 Team Playoff
-          </p>
+  const MatchCard = ({ match, isAdmin }: { match: BracketMatch; isAdmin: boolean }) => (
+    <div className="bg-muted/50 rounded border border-border p-3 min-w-[180px]" data-testid={`card-match-${match.id}`}>
+      <div className="divide-y text-sm">
+        <div className="pb-2 font-medium">
+          {isAdmin ? (
+            <Input
+              size={1}
+              value={match.team1?.name || ""}
+              onChange={(e) => {
+                const newTeam = e.target.value
+                  ? { id: `${match.id}-t1`, name: e.target.value }
+                  : undefined;
+                updateMatch(match.id, "team1", newTeam);
+              }}
+              placeholder="Team 1"
+              className="text-xs"
+              data-testid={`input-team1-${match.id}`}
+            />
+          ) : (
+            <>{match.team1?.name || "TBD"}</>
+          )}
+          {match.winner === match.team1?.id && <span className="ml-2 text-primary font-bold">✓</span>}
         </div>
+        <div className="pt-2 font-medium">
+          {isAdmin ? (
+            <Input
+              size={1}
+              value={match.team2?.name || ""}
+              onChange={(e) => {
+                const newTeam = e.target.value
+                  ? { id: `${match.id}-t2`, name: e.target.value }
+                  : undefined;
+                updateMatch(match.id, "team2", newTeam);
+              }}
+              placeholder="Team 2"
+              className="text-xs"
+              data-testid={`input-team2-${match.id}`}
+            />
+          ) : (
+            <>{match.team2?.name || "TBD"}</>
+          )}
+          {match.winner === match.team2?.id && <span className="ml-2 text-primary font-bold">✓</span>}
+        </div>
+      </div>
+      {isAdmin && match.team1 && match.team2 && (
+        <div className="mt-2 flex gap-1">
+          <Button
+            variant={match.winner === match.team1.id ? "default" : "outline"}
+            size="sm"
+            onClick={() => updateMatch(match.id, "winner", match.team1?.id)}
+            className="flex-1 text-xs"
+            data-testid={`button-winner1-${match.id}`}
+          >
+            W
+          </Button>
+          <Button
+            variant={match.winner === match.team2?.id ? "default" : "outline"}
+            size="sm"
+            onClick={() => updateMatch(match.id, "winner", match.team2?.id)}
+            className="flex-1 text-xs"
+            data-testid={`button-winner2-${match.id}`}
+          >
+            W
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 
-        {isAuthenticated ? (
-          <div className="space-y-8">
-            {[1, 2, 3].map((round) => (
-              <Card key={round} className="p-6">
-                <h2 className="text-2xl font-bold mb-6">{roundNames[round]}</h2>
-                <div className="space-y-4">
-                  {getMatchesForRound(round).map((match) => (
-                    <div
-                      key={match.id}
-                      className="border rounded-lg p-4 bg-muted/30 space-y-3"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[1, 2].map((teamNum) => {
-                          const teamKey = (teamNum === 1 ? "team1" : "team2") as "team1" | "team2";
-                          const team = match[teamKey];
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
+          Playoff Bracket
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          BFFL Season 1 - 12 Team Playoff
+        </p>
+      </div>
 
-                          return (
-                            <div key={teamNum}>
-                              <Label>Team {teamNum}</Label>
-                              <Input
-                                list={`teams-${match.id}-${teamNum}`}
-                                value={team?.name || ""}
-                                onChange={(e) => {
-                                  const newTeam = e.target.value
-                                    ? { id: `${match.id}-t${teamNum}`, name: e.target.value }
-                                    : undefined;
-                                  updateMatch(match.id, teamKey, newTeam);
-                                }}
-                                placeholder="Enter team name"
-                              />
-                              <datalist id={`teams-${match.id}-${teamNum}`}>
-                                {AVAILABLE_TEAMS.filter((t) => !usedTeams.includes(t) || team?.name === t).map(
-                                  (team) => (
-                                    <option key={team} value={team} />
-                                  )
-                                )}
-                              </datalist>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {match.team1 && match.team2 && (
-                        <div className="pt-3 border-t">
-                          <Label className="mb-2 block">Winner</Label>
-                          <div className="flex gap-2">
-                            <Button
-                              variant={match.winner === match.team1.id ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => updateMatch(match.id, "winner", match.team1?.id)}
-                              className="flex-1"
-                            >
-                              {match.team1.name}
-                            </Button>
-                            <Button
-                              variant={match.winner === match.team2?.id ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => updateMatch(match.id, "winner", match.team2?.id)}
-                              className="flex-1"
-                            >
-                              {match.team2.name}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="p-8 overflow-x-auto">
-            <div className="min-w-max flex gap-8 justify-center">
-              {[1, 2, 3].map((round) => {
-                const matches = getMatchesForRound(round);
-                return (
-                  <div key={round} className="flex flex-col justify-center gap-4">
-                    <h3 className="text-center font-semibold text-sm mb-4">
-                      {roundNames[round]}
-                    </h3>
-                    <div className="flex flex-col gap-8 justify-center">
-                      {matches.map((match, idx) => {
-                        const spacing = Math.pow(2, round - 1);
-                        return (
-                          <div
-                            key={match.id}
-                            style={{
-                              marginTop: idx === 0 ? 0 : `${(spacing - 1) * 2}rem`,
-                            }}
-                          >
-                            <div className="bg-muted rounded border border-border min-w-[200px]">
-                              <div className="divide-y">
-                                <div className="p-3 text-sm font-medium">
-                                  {match.team1?.name || "TBD"}
-                                  {match.winner === match.team1?.id && (
-                                    <span className="ml-2 text-xs font-bold text-primary">✓</span>
-                                  )}
-                                </div>
-                                <div className="p-3 text-sm font-medium">
-                                  {match.team2?.name || "TBD"}
-                                  {match.winner === match.team2?.id && (
-                                    <span className="ml-2 text-xs font-bold text-primary">✓</span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+      {isAuthenticated ? (
+        <div className="space-y-8">
+          <Card className="p-6">
+            <div className="grid grid-cols-2 gap-8">
+              {/* TOP SIDE */}
+              <div>
+                <h2 className="text-xl font-bold mb-6 pb-2 border-b">Top Bracket</h2>
+                <div className="space-y-8">
+                  {/* Round 1 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Play-In</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(1, "top").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
                     </div>
                   </div>
-                );
-              })}
+
+                  {/* Round 2 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Divisional</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(2, "top").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Round 3 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Championship</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(3, "top").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM SIDE */}
+              <div>
+                <h2 className="text-xl font-bold mb-6 pb-2 border-b">Bottom Bracket</h2>
+                <div className="space-y-8">
+                  {/* Round 1 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Play-In</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(1, "bottom").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Round 2 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Divisional</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(2, "bottom").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Round 3 */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Championship</h3>
+                    <div className="space-y-3">
+                      {getMatchesForRound(3, "bottom").map((match) => (
+                        <MatchCard key={match.id} match={match} isAdmin={true} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </Card>
-        )}
-      </div>
+
+          {/* Super Bowl */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-6">Super Bowl</h2>
+            <div className="flex justify-center">
+              {getMatchesForRound(4, "top").map((match) => (
+                <MatchCard key={match.id} match={match} isAdmin={true} />
+              ))}
+            </div>
+          </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-8 mb-8">
+          {/* TOP SIDE - VIEW */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-6 pb-2 border-b">Top Bracket</h2>
+            <div className="space-y-8">
+              {[1, 2, 3].map((round) => (
+                <div key={round}>
+                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+                    {round === 1 ? "Play-In" : round === 2 ? "Divisional" : "Championship"}
+                  </h3>
+                  <div className="space-y-3">
+                    {getMatchesForRound(round, "top").map((match) => (
+                      <MatchCard key={match.id} match={match} isAdmin={false} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* BOTTOM SIDE - VIEW */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-6 pb-2 border-b">Bottom Bracket</h2>
+            <div className="space-y-8">
+              {[1, 2, 3].map((round) => (
+                <div key={round}>
+                  <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+                    {round === 1 ? "Play-In" : round === 2 ? "Divisional" : "Championship"}
+                  </h3>
+                  <div className="space-y-3">
+                    {getMatchesForRound(round, "bottom").map((match) => (
+                      <MatchCard key={match.id} match={match} isAdmin={false} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
