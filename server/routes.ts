@@ -10,6 +10,7 @@ import {
   insertPickemSchema,
   insertPickemRulesSchema,
   insertStandingsSchema,
+  insertPlayoffMatchSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -222,6 +223,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting standing:", error);
       res.status(400).json({ message: "Failed to delete standing" });
+    }
+  });
+
+  app.get("/api/playoffs", async (req, res) => {
+    try {
+      const matches = await storage.getAllPlayoffMatches();
+      res.json(matches);
+    } catch (error) {
+      console.error("Error fetching playoff matches:", error);
+      res.status(500).json({ message: "Failed to fetch playoff matches" });
+    }
+  });
+
+  app.get("/api/playoffs/round/:round", async (req, res) => {
+    try {
+      const matches = await storage.getPlayoffMatchesByRound(req.params.round);
+      res.json(matches);
+    } catch (error) {
+      console.error("Error fetching playoff round:", error);
+      res.status(500).json({ message: "Failed to fetch playoff round" });
+    }
+  });
+
+  app.post("/api/playoffs", isAuthenticated, async (req, res) => {
+    try {
+      const matchData = insertPlayoffMatchSchema.parse(req.body);
+      const match = await storage.createPlayoffMatch(matchData);
+      res.json(match);
+    } catch (error) {
+      console.error("Error creating playoff match:", error);
+      res.status(400).json({ message: "Failed to create playoff match" });
+    }
+  });
+
+  app.patch("/api/playoffs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const match = await storage.updatePlayoffMatch(req.params.id, req.body);
+      res.json(match);
+    } catch (error) {
+      console.error("Error updating playoff match:", error);
+      res.status(400).json({ message: "Failed to update playoff match" });
+    }
+  });
+
+  app.delete("/api/playoffs/:id", isAuthenticated, async (req, res) => {
+    try {
+      await storage.deletePlayoffMatch(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting playoff match:", error);
+      res.status(400).json({ message: "Failed to delete playoff match" });
     }
   });
 

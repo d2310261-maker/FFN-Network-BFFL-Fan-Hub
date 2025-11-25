@@ -6,6 +6,7 @@ import {
   pickems,
   pickemRules,
   standings,
+  playoffMatches,
   type User,
   type UpsertUser,
   type Game,
@@ -20,6 +21,8 @@ import {
   type InsertPickemRules,
   type Standings,
   type InsertStandings,
+  type PlayoffMatch,
+  type InsertPlayoffMatch,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -54,6 +57,12 @@ export interface IStorage {
   getAllStandings(): Promise<Standings[]>;
   upsertStandings(standing: InsertStandings): Promise<Standings>;
   deleteStandings(id: string): Promise<void>;
+  
+  getAllPlayoffMatches(): Promise<PlayoffMatch[]>;
+  getPlayoffMatchesByRound(round: string): Promise<PlayoffMatch[]>;
+  createPlayoffMatch(match: InsertPlayoffMatch): Promise<PlayoffMatch>;
+  updatePlayoffMatch(id: string, match: Partial<PlayoffMatch>): Promise<PlayoffMatch>;
+  deletePlayoffMatch(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -222,6 +231,32 @@ export class DatabaseStorage implements IStorage {
 
   async deleteStandings(id: string): Promise<void> {
     await db.delete(standings).where(eq(standings.id, id));
+  }
+
+  async getAllPlayoffMatches(): Promise<PlayoffMatch[]> {
+    return await db.select().from(playoffMatches).orderBy(playoffMatches.round, playoffMatches.matchNumber);
+  }
+
+  async getPlayoffMatchesByRound(round: string): Promise<PlayoffMatch[]> {
+    return await db.select().from(playoffMatches).where(eq(playoffMatches.round, round)).orderBy(playoffMatches.matchNumber);
+  }
+
+  async createPlayoffMatch(matchData: InsertPlayoffMatch): Promise<PlayoffMatch> {
+    const [match] = await db.insert(playoffMatches).values(matchData).returning();
+    return match;
+  }
+
+  async updatePlayoffMatch(id: string, matchData: Partial<PlayoffMatch>): Promise<PlayoffMatch> {
+    const [match] = await db
+      .update(playoffMatches)
+      .set({ ...matchData, updatedAt: new Date() })
+      .where(eq(playoffMatches.id, id))
+      .returning();
+    return match;
+  }
+
+  async deletePlayoffMatch(id: string): Promise<void> {
+    await db.delete(playoffMatches).where(eq(playoffMatches.id, id));
   }
 }
 

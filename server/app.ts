@@ -9,7 +9,7 @@ import express, {
 
 import { registerRoutes } from "./routes";
 import { db } from "./db";
-import { games, news, chatMessages, pickems, pickemRules, standings, sessions } from "@shared/schema";
+import { games, news, chatMessages, pickems, pickemRules, standings, playoffMatches, sessions } from "@shared/schema";
 import { sql } from "drizzle-orm";
 
 export function log(message: string, source = "express") {
@@ -169,6 +169,25 @@ export default async function runApp(
           wins INTEGER DEFAULT 0,
           losses INTEGER DEFAULT 0,
           ties INTEGER DEFAULT 0,
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      
+      // Create playoff_matches table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS playoff_matches (
+          id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+          round VARCHAR(50) NOT NULL,
+          match_number INTEGER NOT NULL,
+          seed1 INTEGER,
+          seed2 INTEGER,
+          team1 VARCHAR(100),
+          team2 VARCHAR(100),
+          team1_score INTEGER,
+          team2_score INTEGER,
+          winner VARCHAR(100),
+          is_complete BOOLEAN DEFAULT false,
+          created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
       `);

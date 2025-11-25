@@ -153,3 +153,29 @@ export const insertStandingsSchema = createInsertSchema(standings).omit({
 
 export type InsertStandings = z.infer<typeof insertStandingsSchema>;
 export type Standings = typeof standings.$inferSelect;
+
+// Playoff bracket table
+export const playoffMatches = pgTable("playoff_matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  round: varchar("round", { length: 50 }).notNull(), // "play_in", "wildcard", "divisional", "conference", "super_bowl"
+  matchNumber: integer("match_number").notNull(), // 1-8 for play-in, 1-4 for wildcard, etc.
+  seed1: integer("seed1"), // seed number (1-12)
+  seed2: integer("seed2"),
+  team1: varchar("team1", { length: 100 }), // team name
+  team2: varchar("team2", { length: 100 }),
+  team1Score: integer("team1_score"),
+  team2Score: integer("team2_score"),
+  winner: varchar("winner", { length: 100 }), // winning team name
+  isComplete: boolean("is_complete").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPlayoffMatchSchema = createInsertSchema(playoffMatches).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPlayoffMatch = z.infer<typeof insertPlayoffMatchSchema>;
+export type PlayoffMatch = typeof playoffMatches.$inferSelect;
