@@ -58,7 +58,7 @@ export default function News() {
           {news.map((post) => (
             <Card key={post.id} className="p-6 flex flex-col hover-elevate active-elevate-2" data-testid={`card-news-${post.id}`}>
               <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2 line-clamp-2 dark:text-white" data-testid={`text-title-${post.id}`}>
+                <h3 className="text-xl font-bold mb-2 line-clamp-2 dark:!text-white" data-testid={`text-title-${post.id}`}>
                   {post.title}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4" data-testid={`text-date-${post.id}`}>
