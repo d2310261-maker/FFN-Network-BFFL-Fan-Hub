@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BracketTeam {
   id: string;
@@ -71,48 +71,46 @@ export default function Playoffs() {
 
   const MatchCard = ({ match }: { match: BracketMatch }) => (
     <div className="flex flex-col gap-1" data-testid={`card-match-${match.id}`}>
-      <div className="border border-border bg-card px-3 py-1 min-w-32 text-xs font-medium" data-testid={`team1-${match.id}`}>
+      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team1-${match.id}`}>
         {isAuthenticated ? (
-          <input
-            list={`teams-${match.id}-1`}
-            value={match.team1?.name || ""}
-            onChange={(e) => {
-              updateMatch(match.id, "team1", e.target.value ? { id: `${match.id}-t1`, name: e.target.value } : undefined);
-            }}
-            placeholder="Team"
-            className="w-full bg-transparent border-0 text-xs focus:outline-none"
-            data-testid={`input-team1-${match.id}`}
-          />
+          <Select value={match.team1?.name || ""} onValueChange={(value) => {
+            updateMatch(match.id, "team1", value ? { id: `${match.id}-t1`, name: value } : undefined);
+          }}>
+            <SelectTrigger className="h-6 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={`input-team1-${match.id}`}>
+              <SelectValue placeholder="Team" />
+            </SelectTrigger>
+            <SelectContent>
+              {AVAILABLE_TEAMS.map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
           <span>{match.team1?.name || "TBD"}</span>
         )}
-        <datalist id={`teams-${match.id}-1`}>
-          {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
-        </datalist>
       </div>
-      <div className="border border-border bg-card px-3 py-1 min-w-32 text-xs font-medium" data-testid={`team2-${match.id}`}>
+      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team2-${match.id}`}>
         {isAuthenticated ? (
-          <input
-            list={`teams-${match.id}-2`}
-            value={match.team2?.name || ""}
-            onChange={(e) => {
-              updateMatch(match.id, "team2", e.target.value ? { id: `${match.id}-t2`, name: e.target.value } : undefined);
-            }}
-            placeholder="Team"
-            className="w-full bg-transparent border-0 text-xs focus:outline-none"
-            data-testid={`input-team2-${match.id}`}
-          />
+          <Select value={match.team2?.name || ""} onValueChange={(value) => {
+            updateMatch(match.id, "team2", value ? { id: `${match.id}-t2`, name: value } : undefined);
+          }}>
+            <SelectTrigger className="h-6 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={`input-team2-${match.id}`}>
+              <SelectValue placeholder="Team" />
+            </SelectTrigger>
+            <SelectContent>
+              {AVAILABLE_TEAMS.map((t) => (
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
           <span>{match.team2?.name || "TBD"}</span>
         )}
-        <datalist id={`teams-${match.id}-2`}>
-          {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
-        </datalist>
       </div>
       {isAuthenticated && match.team1 && match.team2 && (
-        <div className="flex gap-1 mt-1">
-          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-5 text-xs" data-testid={`button-winner1-${match.id}`}>W</Button>
-          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-5 text-xs" data-testid={`button-winner2-${match.id}`}>W</Button>
+        <div className="flex gap-1 mt-0.5">
+          <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-5 text-xs px-1" data-testid={`button-winner1-${match.id}`}>W</Button>
+          <Button variant={match.winner === match.team2?.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team2?.id)} className="flex-1 h-5 text-xs px-1" data-testid={`button-winner2-${match.id}`}>W</Button>
         </div>
       )}
     </div>
