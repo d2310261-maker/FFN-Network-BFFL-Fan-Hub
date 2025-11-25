@@ -1,29 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { GameCard } from "@/components/GameCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import type { Game } from "@shared/schema";
 import { useLocation } from "wouter";
 import { AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 
 export default function PreviousWeeks() {
+  const [selectedWeek, setSelectedWeek] = useState(1);
   const [, setLocation] = useLocation();
 
-  const { data: allGames, isLoading, error } = useQuery<Game[]>({
+  const { data: games, isLoading, error } = useQuery<Game[]>({
+    queryKey: ["/api/games/week", selectedWeek],
+  });
+
+  const { data: allGames, isLoading: allGamesLoading } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
   });
 
-  if (error) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-center gap-3 text-destructive">
-          <AlertCircle className="w-5 h-5" />
-          <p>Failed to load games</p>
-        </div>
-      </div>
-    );
-  }
+  const weeks = Array.from({ length: 10 }, (_, i) => i + 1);
 
   const gamesByWeek = allGames?.reduce((acc, game) => {
     if (!acc[game.week]) {
@@ -33,7 +32,7 @@ export default function PreviousWeeks() {
     return acc;
   }, {} as Record<number, Game[]>) || {};
 
-  const weeks = Object.keys(gamesByWeek).map(Number).sort((a, b) => a - b);
+  const playoffWeeks = [11, 12, 13, 14].filter(w => gamesByWeek[w]);
 
   const getRoundName = (week: number) => {
     if (week === 11) return "WILDCARD";
@@ -71,41 +70,88 @@ export default function PreviousWeeks() {
     );
   };
 
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex items-center justify-center gap-3 text-destructive">
+          <AlertCircle className="w-5 h-5" />
+          <p>Failed to load games</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-full mx-auto px-4 py-8">
-      <div className="mb-12">
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-black mb-4" data-testid="text-page-title">
           Previous Weeks
         </h1>
-        <p className="text-muted-foreground text-lg">
-          Browse all games from throughout the season
+        <p className="text-muted-foreground text-lg mb-6">
+          Browse final scores from all weeks of the season
         </p>
+
+        <div className="flex flex-wrap gap-2">
+          {weeks.map((week) => (
+            <Button
+              key={week}
+              variant={selectedWeek === week ? "default" : "outline"}
+              onClick={() => setSelectedWeek(week)}
+              data-testid={`button-week-${week}`}
+            >
+              Week {week}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="space-y-8">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-40" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-64" />
           ))}
         </div>
-      ) : weeks.length > 0 ? (
-        <div className="space-y-12">
-          {weeks.map((week) => (
-            <div key={week}>
-              <h2 className="text-2xl font-bold mb-6 text-primary">{getRoundName(week)}</h2>
-              <div className="flex flex-wrap gap-4">
-                {gamesByWeek[week].map((game) => (
-                  <GameCardCompact key={game.id} game={game} />
-                ))}
-              </div>
-            </div>
+      ) : games && games.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {games.map((game) => (
+            <GameCard
+              key={game.id}
+              game={game}
+              onClick={() => setLocation(`/game/${game.id}`)}
+            />
           ))}
         </div>
       ) : (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-lg">
-            No games found
+            No games found for Week {selectedWeek}
           </p>
+        </div>
+      )}
+
+      {playoffWeeks.length > 0 && (
+        <div className="mt-16 pt-8 border-t">
+          <h2 className="text-3xl font-bold mb-8 text-primary">Playoffs</h2>
+          {allGamesLoading ? (
+            <div className="space-y-8">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-40" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {playoffWeeks.map((week) => (
+                <div key={week}>
+                  <h3 className="text-2xl font-bold mb-6 text-primary">{getRoundName(week)}</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {gamesByWeek[week].map((game) => (
+                      <GameCardCompact key={game.id} game={game} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
