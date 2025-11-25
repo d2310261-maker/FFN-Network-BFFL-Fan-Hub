@@ -73,8 +73,8 @@ export default function Playoffs() {
   };
 
   const MatchBox = ({ match }: { match: BracketMatch }) => (
-    <div className="bg-card border border-border rounded-md p-2 min-w-[180px] text-xs" data-testid={`card-match-${match.id}`}>
-      <div className="space-y-1.5">
+    <div className="bg-card border border-border rounded-md p-4 min-w-[220px] text-sm" data-testid={`card-match-${match.id}`}>
+      <div className="space-y-2.5">
         <div>
           {isAuthenticated ? (
             <Input
@@ -87,11 +87,11 @@ export default function Playoffs() {
                 updateMatch(match.id, "team1", newTeam);
               }}
               placeholder="Team"
-              className="text-xs h-7"
+              className="text-sm h-9"
               data-testid={`input-team1-${match.id}`}
             />
           ) : (
-            <div className="font-medium">{match.team1?.name || "TBD"}</div>
+            <div className="font-medium text-base">{match.team1?.name || "TBD"}</div>
           )}
           <datalist id={`teams-${match.id}-1`}>
             {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
@@ -112,11 +112,11 @@ export default function Playoffs() {
                 updateMatch(match.id, "team2", newTeam);
               }}
               placeholder="Team"
-              className="text-xs h-7"
+              className="text-sm h-9"
               data-testid={`input-team2-${match.id}`}
             />
           ) : (
-            <div className="font-medium">{match.team2?.name || "TBD"}</div>
+            <div className="font-medium text-base">{match.team2?.name || "TBD"}</div>
           )}
           <datalist id={`teams-${match.id}-2`}>
             {AVAILABLE_TEAMS.map((t) => <option key={t} value={t} />)}
@@ -125,12 +125,12 @@ export default function Playoffs() {
       </div>
 
       {isAuthenticated && match.team1 && match.team2 && (
-        <div className="flex gap-0.5 mt-1.5 pt-1.5 border-t">
+        <div className="flex gap-1 mt-3 pt-3 border-t">
           <Button
             variant={match.winner === match.team1.id ? "default" : "outline"}
             size="sm"
             onClick={() => updateMatch(match.id, "winner", match.team1?.id)}
-            className="flex-1 h-6 text-xs"
+            className="flex-1 h-8 text-sm"
             data-testid={`button-winner1-${match.id}`}
           >
             W
@@ -139,7 +139,7 @@ export default function Playoffs() {
             variant={match.winner === match.team2?.id ? "default" : "outline"}
             size="sm"
             onClick={() => updateMatch(match.id, "winner", match.team2?.id)}
-            className="flex-1 h-6 text-xs"
+            className="flex-1 h-8 text-sm"
             data-testid={`button-winner2-${match.id}`}
           >
             W
@@ -154,11 +154,11 @@ export default function Playoffs() {
     const spacing = Math.pow(2, round - 1);
 
     return (
-      <div className="flex flex-col items-center px-2">
-        <div className="text-xs font-bold mb-3 text-muted-foreground">{title}</div>
-        <div className="flex flex-col justify-center gap-8">
+      <div className="flex flex-col items-center px-6">
+        <div className="text-sm font-bold mb-8 text-muted-foreground whitespace-nowrap">{title}</div>
+        <div className="flex flex-col justify-center gap-16">
           {matches.map((match, idx) => (
-            <div key={match.id} style={{ marginTop: idx === 0 ? 0 : `${(spacing - 1) * 30}px` }}>
+            <div key={match.id} style={{ marginTop: idx === 0 ? 0 : `${(spacing - 1) * 80}px` }}>
               <MatchBox match={match} />
             </div>
           ))}
@@ -178,22 +178,22 @@ export default function Playoffs() {
         </div>
 
         <div className="overflow-x-auto">
-          <div className="flex justify-center items-center min-w-max gap-1 pb-8">
+          <div className="flex justify-center items-center min-w-max gap-8 pb-12">
             {/* LEFT SIDE */}
-            <div className="flex gap-2">
+            <div className="flex gap-8">
               <BracketColumn round={1} side="left" title="Play-In" />
               <BracketColumn round={2} side="left" title="Divisional" />
               <BracketColumn round={3} side="left" title="Conf Champ" />
             </div>
 
             {/* SUPER BOWL CENTER */}
-            <div className="flex flex-col items-center px-4">
-              <div className="text-xs font-bold mb-3 text-muted-foreground">Super Bowl</div>
+            <div className="flex flex-col items-center px-12">
+              <div className="text-sm font-bold mb-8 text-muted-foreground">Super Bowl</div>
               <MatchBox match={bracket.find(m => m.id === "sb")!} />
             </div>
 
             {/* RIGHT SIDE */}
-            <div className="flex gap-2">
+            <div className="flex gap-8">
               <BracketColumn round={3} side="right" title="Conf Champ" />
               <BracketColumn round={2} side="right" title="Divisional" />
               <BracketColumn round={1} side="right" title="Play-In" />
