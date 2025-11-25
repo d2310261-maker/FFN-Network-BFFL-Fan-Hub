@@ -36,25 +36,21 @@ const AVAILABLE_TEAMS = [
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [bracket, setBracket] = useState<BracketMatch[]>([
-    // LEFT SIDE - Round 1 (3 matches - outermost)
+    // LEFT SIDE - Round 1 (2 matches - outermost)
     { id: "l1_m1", round: 1, side: "left", position: 0, team1: undefined, team2: undefined },
     { id: "l1_m2", round: 1, side: "left", position: 1, team1: undefined, team2: undefined },
-    { id: "l1_m3", round: 1, side: "left", position: 2, team1: undefined, team2: undefined },
-    // LEFT SIDE - Round 2 (2 matches)
+    // LEFT SIDE - Round 2 (1 match)
     { id: "l2_m1", round: 2, side: "left", position: 0, team1: undefined, team2: undefined },
-    { id: "l2_m2", round: 2, side: "left", position: 1, team1: undefined, team2: undefined },
     // LEFT SIDE - Round 3 (1 match)
     { id: "l3_m1", round: 3, side: "left", position: 0, team1: undefined, team2: undefined },
     
     // RIGHT SIDE - Round 3 (1 match)
     { id: "r3_m1", round: 3, side: "right", position: 0, team1: undefined, team2: undefined },
-    // RIGHT SIDE - Round 2 (2 matches)
+    // RIGHT SIDE - Round 2 (1 match)
     { id: "r2_m1", round: 2, side: "right", position: 0, team1: undefined, team2: undefined },
-    { id: "r2_m2", round: 2, side: "right", position: 1, team1: undefined, team2: undefined },
-    // RIGHT SIDE - Round 1 (3 matches - outermost)
+    // RIGHT SIDE - Round 1 (2 matches - outermost)
     { id: "r1_m1", round: 1, side: "right", position: 0, team1: undefined, team2: undefined },
     { id: "r1_m2", round: 1, side: "right", position: 1, team1: undefined, team2: undefined },
-    { id: "r1_m3", round: 1, side: "right", position: 2, team1: undefined, team2: undefined },
     
     // FINALS (center)
     { id: "finals", round: 4, side: "left", position: 0, team1: undefined, team2: undefined },
