@@ -39,11 +39,6 @@ export default function GameDetail() {
     enabled: !!gameId,
   });
 
-  const { data: userPrediction } = useQuery<Prediction | null>({
-    queryKey: ["/api/predictions", gameId, user?.id],
-    enabled: !!gameId && !!user?.id,
-  });
-
   const voteMutation = useMutation({
     mutationFn: async (teamVote: string) => {
       return await apiRequest("POST", "/api/predictions", {
@@ -53,7 +48,6 @@ export default function GameDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/predictions", gameId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/predictions", gameId, user?.id] });
     },
   });
 
@@ -252,7 +246,7 @@ export default function GameDetail() {
                 <p className="font-semibold mb-4">Make a Prediction</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button
-                    variant={userPrediction?.votedFor === game.team2 ? "default" : "outline"}
+                    variant="outline"
                     className="gap-2"
                     onClick={() => voteMutation.mutate(game.team2)}
                     disabled={voteMutation.isPending}
@@ -264,7 +258,7 @@ export default function GameDetail() {
                     </Badge>
                   </Button>
                   <Button
-                    variant={userPrediction?.votedFor === game.team1 ? "default" : "outline"}
+                    variant="outline"
                     className="gap-2"
                     onClick={() => voteMutation.mutate(game.team1)}
                     disabled={voteMutation.isPending}

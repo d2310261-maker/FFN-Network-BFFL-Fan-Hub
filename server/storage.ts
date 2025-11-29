@@ -76,7 +76,6 @@ export interface IStorage {
   
   getPredictionsByGameId(gameId: string): Promise<Prediction[]>;
   createPrediction(prediction: InsertPrediction): Promise<Prediction>;
-  getUserPredictionForGame(gameId: string, userId: string): Promise<Prediction | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -292,14 +291,6 @@ export class DatabaseStorage implements IStorage {
 
   async createPrediction(predictionData: InsertPrediction): Promise<Prediction> {
     const [prediction] = await db.insert(predictions).values(predictionData).returning();
-    return prediction;
-  }
-
-  async getUserPredictionForGame(gameId: string, userId: string): Promise<Prediction | undefined> {
-    const [prediction] = await db
-      .select()
-      .from(predictions)
-      .where(and(eq(predictions.gameId, gameId), eq(predictions.userId, userId)));
     return prediction;
   }
 }

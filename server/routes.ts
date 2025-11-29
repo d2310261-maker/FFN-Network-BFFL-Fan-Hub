@@ -387,26 +387,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/predictions", isAuthenticated, async (req: any, res) => {
+  app.post("/api/predictions", async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      
-      const predictionData = insertPredictionSchema.parse({ ...req.body, userId });
+      const predictionData = insertPredictionSchema.parse(req.body);
       const prediction = await storage.createPrediction(predictionData);
       res.json(prediction);
     } catch (error) {
       console.error("Error creating prediction:", error);
       res.status(400).json({ message: "Failed to create prediction" });
-    }
-  });
-
-  app.get("/api/predictions/:gameId/:userId", async (req, res) => {
-    try {
-      const prediction = await storage.getUserPredictionForGame(req.params.gameId, req.params.userId);
-      res.json(prediction || null);
-    } catch (error) {
-      console.error("Error fetching user prediction:", error);
-      res.status(500).json({ message: "Failed to fetch prediction" });
     }
   });
 
