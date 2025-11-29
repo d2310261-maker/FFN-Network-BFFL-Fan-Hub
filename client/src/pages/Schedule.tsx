@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TEAMS } from "@/lib/nflTeams";
 import type { Game } from "@shared/schema";
 import { isFuture, isPast } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -85,11 +86,19 @@ export default function Schedule() {
                             </Badge>
                           </div>
                           <div className="space-y-1">
-                            <p className="font-semibold text-lg" data-testid={`text-matchup-${game.id}`}>
-                              {game.team2} vs {game.team1}
-                            </p>
+                            <div className="flex items-center gap-2 font-semibold text-lg" data-testid={`text-matchup-${game.id}`}>
+                              <div className="flex items-center gap-1 min-w-0">
+                                {TEAMS[game.team2 as keyof typeof TEAMS] && <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-6 h-6 object-contain flex-shrink-0" />}
+                                <span className="truncate">{game.team2}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground flex-shrink-0">vs</span>
+                              <div className="flex items-center gap-1 min-w-0">
+                                {TEAMS[game.team1 as keyof typeof TEAMS] && <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-6 h-6 object-contain flex-shrink-0" />}
+                                <span className="truncate">{game.team1}</span>
+                              </div>
+                            </div>
                             {game.isFinal && (
-                              <p className="text-muted-foreground" data-testid={`text-score-${game.id}`}>
+                              <p className="text-muted-foreground text-sm" data-testid={`text-score-${game.id}`}>
                                 Final: {game.team2} {game.team2Score} - {game.team1Score} {game.team1}
                               </p>
                             )}
