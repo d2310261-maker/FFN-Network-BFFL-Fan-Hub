@@ -49,13 +49,8 @@ export default function GameDetail() {
     container.className = 'confetti-container';
     document.body.appendChild(container);
 
-    // Create flash overlay
-    const flash = document.createElement('div');
-    flash.className = 'flash-overlay';
-    container.appendChild(flash);
-
     // Create falling confetti
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 60; i++) {
       setTimeout(() => {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
@@ -65,54 +60,13 @@ export default function GameDetail() {
         piece.style.width = (Math.random() * 12 + 4) + 'px';
         piece.style.height = (Math.random() * 12 + 4) + 'px';
         piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '20%';
-        piece.style.boxShadow = `0 0 10px ${colors[Math.floor(Math.random() * colors.length)]}`;
         container.appendChild(piece);
-      }, i * 20);
-    }
-
-    // Create burst particles from center
-    for (let i = 0; i < 40; i++) {
-      setTimeout(() => {
-        const angle = (Math.PI * 2 * i) / 40;
-        const distance = 200 + Math.random() * 300;
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance;
-
-        const piece = document.createElement('div');
-        piece.className = 'burst-piece';
-        piece.style.left = '50%';
-        piece.style.top = '50%';
-        piece.style.width = (Math.random() * 20 + 8) + 'px';
-        piece.style.height = (Math.random() * 20 + 8) + 'px';
-        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.borderRadius = '50%';
-        piece.style.setProperty('--tx', tx + 'px');
-        piece.style.setProperty('--ty', ty + 'px');
-        piece.style.boxShadow = `0 0 15px ${colors[Math.floor(Math.random() * colors.length)]}`;
-        container.appendChild(piece);
-      }, i * 50 + 100);
-    }
-
-    // Create floating ribbon shapes
-    for (let i = 0; i < 30; i++) {
-      setTimeout(() => {
-        const piece = document.createElement('div');
-        piece.className = 'float-piece';
-        piece.style.left = Math.random() * 100 + '%';
-        piece.style.top = '50%';
-        piece.style.width = (Math.random() * 40 + 20) + 'px';
-        piece.style.height = (Math.random() * 8 + 3) + 'px';
-        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.borderRadius = '50%';
-        piece.style.opacity = '0.8';
-        piece.style.boxShadow = `0 0 20px ${colors[Math.floor(Math.random() * colors.length)]}`;
-        container.appendChild(piece);
-      }, i * 60 + 200);
+      }, i * 30);
     }
 
     setTimeout(() => {
       container.remove();
-    }, 3500);
+    }, 3000);
   };
 
   useEffect(() => {
