@@ -34,7 +34,7 @@ export default function GameDetail() {
     enabled: !!gameId,
   });
 
-  const { data: predictions } = useQuery<Prediction[]>({
+  const { data: predictions, refetch: refetchPredictions } = useQuery<Prediction[]>({
     queryKey: ["/api/predictions", gameId],
     enabled: !!gameId,
   });
@@ -47,7 +47,7 @@ export default function GameDetail() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/predictions", gameId] });
+      refetchPredictions();
     },
   });
 

@@ -377,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/predictions/game/:gameId", async (req, res) => {
+  app.get("/api/predictions/:gameId", async (req, res) => {
     try {
       const predictions = await storage.getPredictionsByGameId(req.params.gameId);
       res.json(predictions);
