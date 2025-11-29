@@ -27,9 +27,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" data-testid="link-home">
-            <h1 className="text-xl md:text-2xl font-bold text-foreground hover-elevate active-elevate-2 px-3 py-2 rounded-md cursor-pointer">
-              BFFL Fan Hub
+          <Link href="/" data-testid="link-home" className="flex-shrink-0">
+            <h1 className="text-sm md:text-lg lg:text-xl font-bold text-foreground hover-elevate active-elevate-2 px-2 md:px-3 py-2 rounded-md cursor-pointer whitespace-nowrap">
+              BFFL
             </h1>
           </Link>
 
