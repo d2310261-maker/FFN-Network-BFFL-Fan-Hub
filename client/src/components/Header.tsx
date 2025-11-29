@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, Shield, Moon, Sun } from "lucide-react";
+import { Menu, X, Shield, Moon, Sun, Zap, Calendar, Trophy, BarChart3, Newspaper, Target, Link2, Users, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -12,15 +12,15 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { path: "/scores", label: "Scores" },
-    { path: "/schedule", label: "Schedule" },
-    { path: "/playoffs", label: "Playoffs" },
-    { path: "/standings", label: "Standings" },
-    { path: "/previous-weeks", label: "Previous Weeks" },
-    { path: "/news", label: "News" },
-    { path: "/pickems", label: "Pick'ems" },
-    { path: "/social", label: "Social" },
-    { path: "/changelogs", label: "Changelogs" },
+    { path: "/scores", label: "Scores", icon: Zap },
+    { path: "/schedule", label: "Schedule", icon: Calendar },
+    { path: "/playoffs", label: "Playoffs", icon: Trophy },
+    { path: "/standings", label: "Standings", icon: BarChart3 },
+    { path: "/previous-weeks", label: "Previous Weeks", icon: Calendar },
+    { path: "/news", label: "News", icon: Newspaper },
+    { path: "/pickems", label: "Pick'ems", icon: Target },
+    { path: "/social", label: "Social", icon: Users },
+    { path: "/changelogs", label: "Changelogs", icon: BookOpen },
   ];
 
   return (
@@ -33,12 +33,12 @@ export function Header() {
             </h1>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <Link key={item.path} href={item.path} data-testid={`link-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
                 <Button
                   variant={location === item.path ? "secondary" : "ghost"}
-                  size="default"
+                  size="sm"
                   className="font-medium"
                 >
                   {item.label}
@@ -59,7 +59,7 @@ export function Header() {
 
             {isAuthenticated && (
               <Link href="/admin" data-testid="link-admin">
-                <Button variant="outline" size="default" className="hidden md:flex gap-2">
+                <Button variant="outline" size="sm" className="hidden lg:flex gap-2">
                   <Shield className="w-4 h-4" />
                   Admin
                 </Button>
@@ -68,13 +68,13 @@ export function Header() {
 
             {isAuthenticated ? (
               <a href="/api/logout" data-testid="link-logout">
-                <Button variant="outline" size="default">
+                <Button variant="outline" size="sm" className="hidden md:flex">
                   Logout
                 </Button>
               </a>
             ) : (
               <a href="/login" data-testid="link-login">
-                <Button variant="default" size="default">
+                <Button variant="default" size="sm" className="hidden md:flex">
                   Admin Login
                 </Button>
               </a>
@@ -83,42 +83,73 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="button-mobile-menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </Button>
           </div>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 pt-2 space-y-1 border-t">
-            {navItems.map((item) => (
-              <Link key={item.path} href={item.path} data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                <Button
-                  variant={location === item.path ? "secondary" : "ghost"}
-                  size="default"
-                  className="w-full justify-start font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
-            {isAuthenticated && (
-              <Link href="/admin" data-testid="link-mobile-admin">
-                <Button
-                  variant="ghost"
-                  size="default"
-                  className="w-full justify-start gap-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Shield className="w-4 h-4" />
-                  Admin Dashboard
-                </Button>
-              </Link>
-            )}
+          <div className="lg:hidden pb-4 pt-2 space-y-2 border-t">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link key={item.path} href={item.path} data-testid={`link-mobile-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Button
+                    variant={location === item.path ? "secondary" : "ghost"}
+                    size="default"
+                    className="w-full justify-start gap-3 font-medium h-12"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+            
+            <div className="border-t pt-2 mt-2 space-y-2">
+              {isAuthenticated && (
+                <Link href="/admin" data-testid="link-mobile-admin">
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    className="w-full justify-start gap-3 h-12"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Shield className="w-5 h-5 flex-shrink-0" />
+                    <span>Admin Dashboard</span>
+                  </Button>
+                </Link>
+              )}
+
+              {isAuthenticated ? (
+                <a href="/api/logout" data-testid="link-mobile-logout" className="block">
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="w-full justify-start h-12"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Logout
+                  </Button>
+                </a>
+              ) : (
+                <a href="/login" data-testid="link-mobile-login" className="block">
+                  <Button
+                    variant="default"
+                    size="default"
+                    className="w-full justify-start h-12"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Admin Login
+                  </Button>
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>
