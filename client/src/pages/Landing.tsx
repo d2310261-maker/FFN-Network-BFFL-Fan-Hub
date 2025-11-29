@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GameCard } from "@/components/GameCard";
 import type { Game, News as NewsType } from "@shared/schema";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { ArrowRight, Calendar, MessageSquare, Trophy, Newspaper, Target } from "lucide-react";
 import { format } from "date-fns";
 
@@ -111,19 +111,26 @@ export default function Landing() {
           ) : featuredNews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredNews.map((post) => (
-                <Card key={post.id} className="p-6 flex flex-col hover-elevate" data-testid={`news-card-${post.id}`}>
-                  <h3 className="text-lg font-bold mb-2 line-clamp-2" data-testid={`news-title-${post.id}`}>
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4" data-testid={`news-date-${post.id}`}>
-                    {format(new Date(post.createdAt!), "MMM d, yyyy")}
-                  </p>
-                  {post.excerpt && (
-                    <p className="text-muted-foreground mb-4 line-clamp-3 flex-1" data-testid={`news-excerpt-${post.id}`}>
-                      {post.excerpt}
-                    </p>
-                  )}
-                </Card>
+                <Link key={post.id} href={`/news/${post.id}`}>
+                  <Card className="p-6 flex flex-col hover-elevate active-elevate-2 cursor-pointer h-full" data-testid={`news-card-${post.id}`}>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold mb-2 line-clamp-2 dark:!text-white" data-testid={`news-title-${post.id}`}>
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4" data-testid={`news-date-${post.id}`}>
+                        {format(new Date(post.createdAt!), "MMM d, yyyy")}
+                      </p>
+                      {post.excerpt && (
+                        <p className="text-muted-foreground mb-4 line-clamp-3 flex-1" data-testid={`news-excerpt-${post.id}`}>
+                          {post.excerpt}
+                        </p>
+                      )}
+                      <div className="prose prose-sm max-w-none line-clamp-4 dark:text-white dark:prose-invert" data-testid={`news-content-${post.id}`}>
+                        {post.content}
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (

@@ -82,7 +82,7 @@ export default function SocialLinks() {
               Share Your Feedback
             </h3>
             <p className="text-sm text-muted-foreground mb-6 flex-1">
-              Help us improve! Let us know what you think about BFFL
+              Help us improve! Let us know what you think about the website and report any issues you encounter, or suggestions you have.
             </p>
             <Button variant="outline" size="sm" className="gap-2" data-testid="button-feedback">
               <Link2 className="w-4 h-4" />
