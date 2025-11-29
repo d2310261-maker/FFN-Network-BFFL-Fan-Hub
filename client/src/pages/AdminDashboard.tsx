@@ -100,6 +100,7 @@ export default function AdminDashboard() {
 function GamesManager() {
   const { toast } = useToast();
   const [week, setWeek] = useState(1);
+  const [filterWeek, setFilterWeek] = useState<string>("all");
   const [gamesList, setGamesList] = useState<Array<{ team1: string; team2: string; date: string; time: string }>>([
     { team1: "", team2: "", date: "", time: "" },
   ]);
@@ -353,9 +354,26 @@ function GamesManager() {
       </Card>
 
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">All Games</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">All Games</h2>
+          <div className="w-40">
+            <Select value={filterWeek} onValueChange={setFilterWeek}>
+              <SelectTrigger data-testid="select-filter-week">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Weeks</SelectItem>
+                {[...Array(14)].map((_, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="space-y-3">
-          {games?.map((game) => (
+          {games?.filter(game => filterWeek === "all" || game.week === parseInt(filterWeek)).map((game) => (
             <div key={game.id} data-testid={`game-item-${game.id}`}>
               {editingGameId === game.id ? (
                 <div className="p-4 border rounded-md bg-muted/30 space-y-3">
@@ -465,6 +483,7 @@ function GamesManager() {
 
 function ScoresManager() {
   const { toast } = useToast();
+  const [filterWeek, setFilterWeek] = useState<string>("all");
   const { data: games } = useQuery<Game[]>({
     queryKey: ["/api/games/all"],
   });
@@ -497,9 +516,26 @@ function ScoresManager() {
   return (
     <div className="space-y-4">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Update Scores</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">Update Scores</h2>
+          <div className="w-40">
+            <Select value={filterWeek} onValueChange={setFilterWeek}>
+              <SelectTrigger data-testid="select-scores-filter-week">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Weeks</SelectItem>
+                {[...Array(14)].map((_, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="space-y-4">
-          {games?.map((game) => (
+          {games?.filter(game => filterWeek === "all" || game.week === parseInt(filterWeek)).map((game) => (
             <Card key={game.id} className="p-4" data-testid={`score-card-${game.id}`}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
