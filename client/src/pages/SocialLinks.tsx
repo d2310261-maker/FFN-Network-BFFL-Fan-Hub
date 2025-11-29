@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Github, Twitter, Linkedin, Mail, Link2 } from "lucide-react";
+import { Link2 } from "lucide-react";
 import { Music, Youtube } from "lucide-react";
 
 interface SocialLink {
@@ -14,45 +14,17 @@ interface SocialLink {
 export default function SocialLinks() {
   const socialLinks: SocialLink[] = [
     {
-      title: "GitHub",
-      description: "Follow our development on GitHub",
-      icon: <Github className="w-8 h-8" />,
-      url: "https://github.com",
-      color: "hover:text-zinc-600 dark:hover:text-zinc-400",
-    },
-    {
-      title: "Twitter",
-      description: "Get the latest updates and news",
-      icon: <Twitter className="w-8 h-8" />,
-      url: "https://twitter.com",
-      color: "hover:text-blue-400",
-    },
-    {
-      title: "LinkedIn",
-      description: "Connect with our team professionally",
-      icon: <Linkedin className="w-8 h-8" />,
-      url: "https://linkedin.com",
-      color: "hover:text-blue-600",
-    },
-    {
-      title: "Email",
-      description: "Send us an email",
-      icon: <Mail className="w-8 h-8" />,
-      url: "mailto:contact@bffl.com",
-      color: "hover:text-red-500",
-    },
-    {
       title: "Discord",
       description: "Join our Discord community",
       icon: <Music className="w-8 h-8" />,
-      url: "https://discord.gg",
+      url: "https://discord.gg/u9w6mNQkhy",
       color: "hover:text-indigo-500",
     },
     {
       title: "YouTube",
       description: "Subscribe to our YouTube channel",
       icon: <Youtube className="w-8 h-8" />,
-      url: "https://youtube.com/@bffl",
+      url: "https://www.youtube.com/channel/UC6SHPaaTEucLm6F9PDBjm7Q",
       color: "hover:text-red-600",
     },
   ];
@@ -68,7 +40,7 @@ export default function SocialLinks() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         {socialLinks.map((link) => (
           <Card
             key={link.title}
