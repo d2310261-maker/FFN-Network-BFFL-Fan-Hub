@@ -21,6 +21,7 @@ export default function GameDetail() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [celebrationTriggered, setCelebrationTriggered] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
+  const confettiTimeoutsRef = useRef<number[]>([]);
   const { user } = useAuth();
 
   const { data: game, isLoading: gameLoading, error: gameError } = useQuery<Game>({
@@ -72,7 +73,7 @@ export default function GameDetail() {
 
     // Create falling confetti - faster spawn for flash effect
     for (let i = 0; i < 400; i++) {
-      setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
         piece.style.left = Math.random() * 100 + '%';
@@ -83,13 +84,19 @@ export default function GameDetail() {
         piece.style.width = size + 'px';
         piece.style.height = size + 'px';
         piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '20%';
-        container.appendChild(piece);
+        if (container.parentNode) {
+          container.appendChild(piece);
+        }
       }, i * 3);
+      confettiTimeoutsRef.current.push(timeoutId);
     }
 
-    setTimeout(() => {
-      container.remove();
+    const cleanupTimeoutId = window.setTimeout(() => {
+      if (container.parentNode) {
+        container.remove();
+      }
     }, 5500);
+    confettiTimeoutsRef.current.push(cleanupTimeoutId);
   };
 
   useEffect(() => {
@@ -134,6 +141,8 @@ export default function GameDetail() {
 
       return () => {
         socket.close();
+        confettiTimeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+        confettiTimeoutsRef.current = [];
       };
     } catch (err) {
       console.error("Failed to establish WebSocket:", err);
