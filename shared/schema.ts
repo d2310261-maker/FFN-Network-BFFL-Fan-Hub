@@ -186,7 +186,7 @@ export const changelogs = pgTable("changelogs", {
   version: varchar("version", { length: 20 }).notNull().unique(),
   title: varchar("title", { length: 200 }).notNull(),
   description: text("description"),
-  status: varchar("status", { length: 50 }).notNull(), // "NEW", "IMPROVED", "FIXED", "DESIGN"
+  status: text("status").notNull(), // JSON array of statuses: ["NEW", "IMPROVED", "FIXED", "DESIGN"]
   changes: text("changes").notNull(), // JSON array stringified
   date: varchar("date", { length: 50 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),

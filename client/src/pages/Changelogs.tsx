@@ -29,9 +29,15 @@ export default function Changelogs() {
   const [version, setVersion] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<"NEW" | "IMPROVED" | "FIXED" | "DESIGN">("NEW");
+  const [statuses, setStatuses] = useState<("NEW" | "IMPROVED" | "FIXED" | "DESIGN")[]>([]);
   const [changesText, setChangesText] = useState("");
   const [date, setDate] = useState(new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }));
+
+  const toggleStatus = (s: "NEW" | "IMPROVED" | "FIXED" | "DESIGN") => {
+    setStatuses(prev => 
+      prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+    );
+  };
 
   const { data: dbChangelogs = [], isLoading } = useQuery<Changelog[]>({
     queryKey: ["/api/changelogs"],
@@ -46,15 +52,15 @@ export default function Changelogs() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      if (!version || !title || !changesText) {
-        throw new Error("Please fill in all required fields");
+      if (!version || !title || !changesText || statuses.length === 0) {
+        throw new Error("Please fill in all required fields and select at least one status");
       }
       const changes = changesText.split("\n").filter(c => c.trim());
       await apiRequest("POST", "/api/changelogs", {
         version,
         title,
         description,
-        status,
+        status: JSON.stringify(statuses),
         changes: JSON.stringify(changes),
         date,
       });
@@ -65,7 +71,7 @@ export default function Changelogs() {
       setTitle("");
       setDescription("");
       setChangesText("");
-      setStatus("NEW");
+      setStatuses([]);
       setShowForm(false);
     },
   });
@@ -109,6 +115,15 @@ export default function Changelogs() {
     }
   };
 
+  const parseStatuses = (statusStr: string): string[] => {
+    try {
+      const parsed = JSON.parse(statusStr);
+      return Array.isArray(parsed) ? parsed : [statusStr];
+    } catch {
+      return [statusStr];
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-12">
@@ -148,24 +163,29 @@ export default function Changelogs() {
                 />
                 <p className="text-xs text-muted-foreground mt-1">Next version: {version}</p>
               </div>
-              <div>
-                <Label htmlFor="status">Status *</Label>
-                <Select value={status} onValueChange={(v: any) => setStatus(v)}>
-                  <SelectTrigger id="status" data-testid="select-status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEW">NEW - New feature or functionality</SelectItem>
-                    <SelectItem value="IMPROVED">IMPROVED - Enhancement to existing feature</SelectItem>
-                    <SelectItem value="FIXED">FIXED - Bug fix or issue resolution</SelectItem>
-                    <SelectItem value="DESIGN">DESIGN - Visual or UI changes</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                  <p><span className="font-semibold">NEW:</span> Brand new features or functionality</p>
-                  <p><span className="font-semibold">IMPROVED:</span> Enhancements to existing features</p>
-                  <p><span className="font-semibold">FIXED:</span> Bug fixes or issue resolutions</p>
-                  <p><span className="font-semibold">DESIGN:</span> Visual or UI/styling changes</p>
+              <div className="md:col-span-2">
+                <Label>Statuses (select all that apply) *</Label>
+                <div className="space-y-2 mt-2">
+                  {[
+                    { value: "NEW", label: "NEW - New feature or functionality" },
+                    { value: "IMPROVED", label: "IMPROVED - Enhancement to existing feature" },
+                    { value: "FIXED", label: "FIXED - Bug fix or issue resolution" },
+                    { value: "DESIGN", label: "DESIGN - Visual or UI changes" },
+                  ].map((option) => (
+                    <div key={option.value} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={`status-${option.value}`}
+                        checked={statuses.includes(option.value as any)}
+                        onChange={() => toggleStatus(option.value as any)}
+                        className="rounded border border-input"
+                        data-testid={`checkbox-status-${option.value.toLowerCase()}`}
+                      />
+                      <Label htmlFor={`status-${option.value}`} className="cursor-pointer font-normal">
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -248,17 +268,22 @@ export default function Changelogs() {
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold" data-testid={`text-version-${changelog.version}`}>
                       v{changelog.version}
                     </h2>
-                    <Badge
-                      className={`flex items-center gap-1 ${getStatusColor(changelog.status)}`}
-                      data-testid={`badge-status-${changelog.version}`}
-                    >
-                      {getStatusIcon(changelog.status)}
-                      {changelog.status}
-                    </Badge>
+                    <div className="flex flex-wrap gap-2">
+                      {parseStatuses(changelog.status).map((s) => (
+                        <Badge
+                          key={s}
+                          className={`flex items-center gap-1 ${getStatusColor(s)}`}
+                          data-testid={`badge-status-${changelog.version}-${s}`}
+                        >
+                          {getStatusIcon(s)}
+                          {s}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                   <p className="text-sm text-muted-foreground" data-testid={`text-date-${changelog.version}`}>
                     {changelog.date}
