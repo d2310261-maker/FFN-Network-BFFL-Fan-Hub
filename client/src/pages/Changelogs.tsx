@@ -155,12 +155,18 @@ export default function Changelogs() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="NEW">NEW</SelectItem>
-                    <SelectItem value="IMPROVED">IMPROVED</SelectItem>
-                    <SelectItem value="FIXED">FIXED</SelectItem>
-                    <SelectItem value="DESIGN">DESIGN</SelectItem>
+                    <SelectItem value="NEW">NEW - New feature or functionality</SelectItem>
+                    <SelectItem value="IMPROVED">IMPROVED - Enhancement to existing feature</SelectItem>
+                    <SelectItem value="FIXED">FIXED - Bug fix or issue resolution</SelectItem>
+                    <SelectItem value="DESIGN">DESIGN - Visual or UI changes</SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                  <p><span className="font-semibold">NEW:</span> Brand new features or functionality</p>
+                  <p><span className="font-semibold">IMPROVED:</span> Enhancements to existing features</p>
+                  <p><span className="font-semibold">FIXED:</span> Bug fixes or issue resolutions</p>
+                  <p><span className="font-semibold">DESIGN:</span> Visual or UI/styling changes</p>
+                </div>
               </div>
             </div>
 
