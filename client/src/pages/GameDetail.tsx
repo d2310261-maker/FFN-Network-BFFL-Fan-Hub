@@ -149,8 +149,8 @@ export default function GameDetail() {
             <div className="space-y-6">
               <div className="flex items-center justify-between py-4 border-b gap-3">
                 <div className="flex-1 flex items-center gap-3 min-w-0">
-                  {TEAMS[game.team2 as keyof typeof TEAMS] && <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-12 h-12 object-contain flex-shrink-0" />}
-                  <h2 className={`text-2xl md:text-3xl font-bold truncate ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team2">
+                  {TEAMS[game.team2 as keyof typeof TEAMS] && <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-12 h-12 object-contain flex-shrink-0" onError={(e) => e.currentTarget.style.display = 'none'} />}
+                  <h2 className={`text-2xl md:text-3xl font-bold ${game.team2Score! > game.team1Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team2">
                     {game.team2}
                   </h2>
                 </div>
@@ -161,8 +161,8 @@ export default function GameDetail() {
 
               <div className="flex items-center justify-between py-4 gap-3">
                 <div className="flex-1 flex items-center gap-3 min-w-0">
-                  {TEAMS[game.team1 as keyof typeof TEAMS] && <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-12 h-12 object-contain flex-shrink-0" />}
-                  <h2 className={`text-2xl md:text-3xl font-bold truncate ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team1">
+                  {TEAMS[game.team1 as keyof typeof TEAMS] && <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-12 h-12 object-contain flex-shrink-0" onError={(e) => e.currentTarget.style.display = 'none'} />}
+                  <h2 className={`text-2xl md:text-3xl font-bold ${game.team1Score! > game.team2Score! && game.isFinal ? 'text-primary' : ''}`} data-testid="text-team1">
                     {game.team1}
                   </h2>
                 </div>

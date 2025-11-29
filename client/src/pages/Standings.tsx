@@ -156,7 +156,7 @@ export default function Standings() {
                     {AVAILABLE_TEAMS.map((team) => (
                       <SelectItem key={team} value={team}>
                         <div className="flex items-center gap-2">
-                          {TEAMS[team as keyof typeof TEAMS] && <img src={TEAMS[team as keyof typeof TEAMS]} alt={team} className="w-4 h-4 object-contain" />}
+                          {TEAMS[team as keyof typeof TEAMS] && <img src={TEAMS[team as keyof typeof TEAMS]} alt={team} className="w-4 h-4 object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />}
                           <span>{team}</span>
                         </div>
                       </SelectItem>
@@ -215,7 +215,7 @@ export default function Standings() {
                             <td className="px-6 py-4 text-sm font-bold">{index + 1}</td>
                             <td className="px-6 py-4 text-sm font-semibold">
                               <div className="flex items-center gap-2">
-                                {TEAMS[entry.team as keyof typeof TEAMS] && <img src={TEAMS[entry.team as keyof typeof TEAMS]} alt={entry.team} className="w-6 h-6 object-contain" />}
+                                {TEAMS[entry.team as keyof typeof TEAMS] && <img src={TEAMS[entry.team as keyof typeof TEAMS]} alt={entry.team} className="w-6 h-6 object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />}
                                 <span>{entry.team}</span>
                               </div>
                             </td>

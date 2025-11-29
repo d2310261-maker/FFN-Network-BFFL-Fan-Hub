@@ -164,7 +164,7 @@ export default function Playoffs() {
     return (
       <div className="border border-border bg-card px-3 py-2 min-w-40 text-xs font-medium flex items-center gap-2" data-testid={isTeam1 ? `team1-${matchId}` : `team2-${matchId}`}>
         {logoUrl && (
-          <img src={logoUrl} alt={team?.name} className="w-6 h-6 object-contain flex-shrink-0" />
+          <img src={logoUrl} alt={team?.name} className="w-6 h-6 object-contain flex-shrink-0" onError={(e) => e.currentTarget.style.display = 'none'} />
         )}
         <div className="flex-1 min-w-0">
           {isAuthenticated ? (
@@ -178,7 +178,7 @@ export default function Playoffs() {
                 {AVAILABLE_TEAMS.map((t) => (
                   <SelectItem key={t} value={t}>
                     <div className="flex items-center gap-2">
-                      <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" />
+                      <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
                       <span>{t}</span>
                     </div>
                   </SelectItem>
