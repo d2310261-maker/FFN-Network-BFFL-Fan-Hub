@@ -19,6 +19,8 @@ export function Header() {
     { path: "/previous-weeks", label: "Previous Weeks" },
     { path: "/news", label: "News" },
     { path: "/pickems", label: "Pick'ems" },
+    { path: "/social", label: "Social" },
+    { path: "/changelogs", label: "Changelogs" },
   ];
 
   return (
