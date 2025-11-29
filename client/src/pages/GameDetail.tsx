@@ -49,19 +49,21 @@ export default function GameDetail() {
     container.className = 'confetti-container';
     document.body.appendChild(container);
 
-    // Create falling confetti
-    for (let i = 0; i < 200; i++) {
+    // Create falling confetti - faster spawn for flash effect
+    for (let i = 0; i < 400; i++) {
       setTimeout(() => {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
         piece.style.left = Math.random() * 100 + '%';
         piece.style.top = -20 + 'px';
         piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.width = (Math.random() * 12 + 4) + 'px';
-        piece.style.height = (Math.random() * 12 + 4) + 'px';
+        // Mix of sizes - some bigger for impact
+        const size = Math.random() > 0.8 ? Math.random() * 18 + 10 : Math.random() * 12 + 4;
+        piece.style.width = size + 'px';
+        piece.style.height = size + 'px';
         piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '20%';
         container.appendChild(piece);
-      }, i * 10);
+      }, i * 3);
     }
 
     setTimeout(() => {
