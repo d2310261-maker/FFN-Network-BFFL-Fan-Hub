@@ -15,7 +15,7 @@ export default function SocialLinks() {
   const socialLinks: SocialLink[] = [
     {
       title: "Discord",
-      description: "Join our Discord community",
+      description: "Join the Discord server",
       icon: <SiDiscord className="w-8 h-8" />,
       url: "https://discord.gg/u9w6mNQkhy",
       color: "hover:text-indigo-500",
