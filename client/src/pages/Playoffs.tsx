@@ -23,24 +23,7 @@ interface BracketMatch {
   position: number;
 }
 
-const TEAMS = {
-  "Atlanta Falcons": "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png",
-  "Tampa Bay Buccaneers": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png",
-  "Jacksonville Jaguars": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png",
-  "Los Angeles Rams": "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png",
-  "Baltimore Ravens": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png",
-  "Miami Dolphins": "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png",
-  "Chicago Bears": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
-  "Houston Texans": "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png",
-  "New Orleans Saints": "https://a.espncdn.com/i/teamlogos/nfl/500/no.png",
-  "San Francisco 49ers": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png",
-  "Kansas City Chiefs": "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png",
-  "Detroit Lions": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png",
-  "Philadelphia Eagles": "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png",
-  "Arizona Cardinals": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png",
-  "Dallas Cowboys": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png",
-  "Buffalo Bills": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png",
-};
+import { TEAMS } from "@/lib/teams";
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
 

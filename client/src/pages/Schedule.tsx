@@ -6,6 +6,7 @@ import type { Game } from "@shared/schema";
 import { isFuture, isPast } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Calendar, MapPin, AlertCircle } from "lucide-react";
+import { TEAMS } from "@/lib/teams";
 
 export default function Schedule() {
   const { data: allGames, isLoading, error } = useQuery<Game[]>({
@@ -76,7 +77,7 @@ export default function Schedule() {
                     <Card key={game.id} className="p-4 hover-elevate" data-testid={`card-game-${game.id}`}>
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center gap-3 mb-3">
                             <Badge
                               variant={game.isLive ? "default" : game.isFinal ? "secondary" : "outline"}
                               data-testid={`badge-status-${game.id}`}
@@ -84,10 +85,18 @@ export default function Schedule() {
                               {game.isLive ? "LIVE" : game.isFinal ? "FINAL" : isUpcoming ? "Upcoming" : game.quarter}
                             </Badge>
                           </div>
-                          <div className="space-y-1">
-                            <p className="font-semibold text-lg" data-testid={`text-matchup-${game.id}`}>
-                              {game.team2} vs {game.team1}
-                            </p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              {TEAMS[game.team2 as keyof typeof TEAMS] && (
+                                <img src={TEAMS[game.team2 as keyof typeof TEAMS]} alt={game.team2} className="w-8 h-8 object-contain" />
+                              )}
+                              <p className="font-semibold text-lg" data-testid={`text-matchup-${game.id}`}>
+                                {game.team2} vs {game.team1}
+                              </p>
+                              {TEAMS[game.team1 as keyof typeof TEAMS] && (
+                                <img src={TEAMS[game.team1 as keyof typeof TEAMS]} alt={game.team1} className="w-8 h-8 object-contain" />
+                              )}
+                            </div>
                             {game.isFinal && (
                               <p className="text-muted-foreground" data-testid={`text-score-${game.id}`}>
                                 Final: {game.team2} {game.team2Score} - {game.team1Score} {game.team1}

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
+import { TEAMS } from "@/lib/teams";
 
 interface StandingsEntry {
   id: string;
@@ -20,24 +21,7 @@ interface StandingsEntry {
   division: "D1" | "D2" | "D3" | "D4";
 }
 
-const AVAILABLE_TEAMS = [
-  "Atlanta Falcons",
-  "Tampa Bay Buccaneers",
-  "Jacksonville Jaguars",
-  "Los Angeles Rams",
-  "Baltimore Ravens",
-  "Miami Dolphins",
-  "Chicago Bears",
-  "Houston Texans",
-  "New Orleans Saints",
-  "San Francisco 49ers",
-  "Kansas City Chiefs",
-  "Detroit Lions",
-  "Philadelphia Eagles",
-  "Arizona Cardinals",
-  "Dallas Cowboys",
-  "Buffalo Bills",
-];
+const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
 const DIVISIONS = ["D1", "D2", "D3", "D4"] as const;
 
@@ -171,7 +155,10 @@ export default function Standings() {
                   <SelectContent>
                     {availableTeams.map((team) => (
                       <SelectItem key={team} value={team}>
-                        {team}
+                        <div className="flex items-center gap-2">
+                          <img src={TEAMS[team as keyof typeof TEAMS]} alt={team} className="w-4 h-4 object-contain" />
+                          <span>{team}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -226,7 +213,14 @@ export default function Standings() {
                         {divisionStandings.map((entry, index) => (
                           <tr key={entry.id} data-testid={`row-team-${entry.id}`}>
                             <td className="px-6 py-4 text-sm font-bold">{index + 1}</td>
-                            <td className="px-6 py-4 text-sm font-semibold">{entry.team}</td>
+                            <td className="px-6 py-4 text-sm font-semibold">
+                              <div className="flex items-center gap-3">
+                                {TEAMS[entry.team as keyof typeof TEAMS] && (
+                                  <img src={TEAMS[entry.team as keyof typeof TEAMS]} alt={entry.team} className="w-6 h-6 object-contain" />
+                                )}
+                                <span>{entry.team}</span>
+                              </div>
+                            </td>
                             <td className="px-6 py-4 text-sm">
                               {isAuthenticated ? (
                                 <Input
