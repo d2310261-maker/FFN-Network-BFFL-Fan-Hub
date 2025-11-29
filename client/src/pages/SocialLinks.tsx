@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Link2, Mail, Youtube } from "lucide-react";
+import { Link2, Youtube } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 
 interface SocialLink {
@@ -64,17 +64,6 @@ export default function SocialLinks() {
           </Card>
         ))}
       </div>
-
-      <Card className="p-8 bg-muted/50">
-        <h2 className="text-2xl font-bold mb-4">Other Ways to Connect</h2>
-        <p className="text-muted-foreground mb-6">
-          Can't find what you're looking for? Reach out to us through our contact page or send us a direct message on any of our social channels. We'd love to hear from you!
-        </p>
-        <Button onClick={() => window.open("mailto:contact@bffl.com", "_blank")} className="gap-2" data-testid="button-contact-us">
-          <Mail className="w-4 h-4" />
-          Contact Us
-        </Button>
-      </Card>
     </div>
   );
 }
