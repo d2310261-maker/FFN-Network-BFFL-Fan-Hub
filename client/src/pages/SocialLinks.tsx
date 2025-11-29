@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Link2, Mail, Music, Youtube } from "lucide-react";
+import { Link2, Mail, Youtube } from "lucide-react";
+import { SiDiscord } from "react-icons/si";
 
 interface SocialLink {
   title: string;
@@ -15,13 +16,13 @@ export default function SocialLinks() {
     {
       title: "Discord",
       description: "Join our Discord community",
-      icon: <Music className="w-8 h-8" />,
+      icon: <SiDiscord className="w-8 h-8" />,
       url: "https://discord.gg/u9w6mNQkhy",
       color: "hover:text-indigo-500",
     },
     {
       title: "YouTube",
-      description: "Subscribe to our YouTube channel",
+      description: "Subscribe to my YouTube channel",
       icon: <Youtube className="w-8 h-8" />,
       url: "https://www.youtube.com/channel/UC6SHPaaTEucLm6F9PDBjm7Q",
       color: "hover:text-red-600",
