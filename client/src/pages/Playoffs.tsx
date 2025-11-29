@@ -23,24 +23,26 @@ interface BracketMatch {
   position: number;
 }
 
-const AVAILABLE_TEAMS = [
-  "Atlanta Falcons",
-  "Tampa Bay Buccaneers",
-  "Jacksonville Jaguars",
-  "Los Angeles Rams",
-  "Baltimore Ravens",
-  "Miami Dolphins",
-  "Chicago Bears",
-  "Houston Texans",
-  "New Orleans Saints",
-  "San Francisco 49ers",
-  "Kansas City Chiefs",
-  "Detroit Lions",
-  "Philadelphia Eagles",
-  "Arizona Cardinals",
-  "Dallas Cowboys",
-  "Buffalo Bills",
-];
+const TEAMS = {
+  "Atlanta Falcons": "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png",
+  "Tampa Bay Buccaneers": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png",
+  "Jacksonville Jaguars": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png",
+  "Los Angeles Rams": "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png",
+  "Baltimore Ravens": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png",
+  "Miami Dolphins": "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png",
+  "Chicago Bears": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
+  "Houston Texans": "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png",
+  "New Orleans Saints": "https://a.espncdn.com/i/teamlogos/nfl/500/no.png",
+  "San Francisco 49ers": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png",
+  "Kansas City Chiefs": "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png",
+  "Detroit Lions": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png",
+  "Philadelphia Eagles": "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png",
+  "Arizona Cardinals": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png",
+  "Dallas Cowboys": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png",
+  "Buffalo Bills": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png",
+};
+
+const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
 function getMatchNumber(round: number, side: "left" | "right", position: number): number {
   if (round === 1) return side === "left" ? position + 1 : position + 3;
@@ -174,44 +176,45 @@ export default function Playoffs() {
     return bracket.filter((m) => m.round === round && m.side === side).sort((a, b) => a.position - b.position);
   };
 
+  const TeamSlot = ({ team, matchId, isTeam1 }: { team?: BracketTeam; matchId: string; isTeam1: boolean }) => {
+    const logoUrl = team ? TEAMS[team.name as keyof typeof TEAMS] : undefined;
+    
+    return (
+      <div className="border border-border bg-card px-3 py-2 min-w-40 text-xs font-medium flex items-center gap-2" data-testid={isTeam1 ? `team1-${matchId}` : `team2-${matchId}`}>
+        {logoUrl && (
+          <img src={logoUrl} alt={team?.name} className="w-6 h-6 object-contain flex-shrink-0" />
+        )}
+        <div className="flex-1 min-w-0">
+          {isAuthenticated ? (
+            <Select value={team?.name || ""} onValueChange={(value) => {
+              updateMatch(matchId, isTeam1 ? "team1" : "team2", value ? { id: `${matchId}-t${isTeam1 ? 1 : 2}`, name: value } : undefined);
+            }}>
+              <SelectTrigger className="h-6 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={isTeam1 ? `input-team1-${matchId}` : `input-team2-${matchId}`}>
+                <SelectValue placeholder="Select team" />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_TEAMS.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    <div className="flex items-center gap-2">
+                      <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" />
+                      <span>{t}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span className="truncate">{team?.name || "TBD"}</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const MatchCard = ({ match }: { match: BracketMatch }) => (
     <div className="flex flex-col gap-1" data-testid={`card-match-${match.id}`}>
-      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team1-${match.id}`}>
-        {isAuthenticated ? (
-          <Select value={match.team1?.name || ""} onValueChange={(value) => {
-            updateMatch(match.id, "team1", value ? { id: `${match.id}-t1`, name: value } : undefined);
-          }}>
-            <SelectTrigger className="h-6 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={`input-team1-${match.id}`}>
-              <SelectValue placeholder="Team" />
-            </SelectTrigger>
-            <SelectContent>
-              {AVAILABLE_TEAMS.map((t) => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <span>{match.team1?.name || "TBD"}</span>
-        )}
-      </div>
-      <div className="border border-border bg-card px-3 py-1 min-w-36 text-xs font-medium" data-testid={`team2-${match.id}`}>
-        {isAuthenticated ? (
-          <Select value={match.team2?.name || ""} onValueChange={(value) => {
-            updateMatch(match.id, "team2", value ? { id: `${match.id}-t2`, name: value } : undefined);
-          }}>
-            <SelectTrigger className="h-6 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={`input-team2-${match.id}`}>
-              <SelectValue placeholder="Team" />
-            </SelectTrigger>
-            <SelectContent>
-              {AVAILABLE_TEAMS.map((t) => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <span>{match.team2?.name || "TBD"}</span>
-        )}
-      </div>
+      <TeamSlot team={match.team1} matchId={match.id} isTeam1={true} />
+      <TeamSlot team={match.team2} matchId={match.id} isTeam1={false} />
       {isAuthenticated && match.team1 && match.team2 && (
         <div className="flex gap-1 mt-0.5">
           <Button variant={match.winner === match.team1.id ? "default" : "outline"} size="sm" onClick={() => updateMatch(match.id, "winner", match.team1?.id)} className="flex-1 h-5 text-xs px-1" data-testid={`button-winner1-${match.id}`}>W</Button>
