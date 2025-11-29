@@ -66,7 +66,7 @@ export default function GameDetail() {
 
     setTimeout(() => {
       container.remove();
-    }, 3000);
+    }, 5500);
   };
 
   useEffect(() => {

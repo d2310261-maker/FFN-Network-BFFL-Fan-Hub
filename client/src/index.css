@@ -321,7 +321,7 @@
 }
 
 .confetti-piece {
-  animation: fall 3s ease-in forwards;
+  animation: fall 5s ease-in forwards;
   display: inline-block;
   position: fixed;
 }
