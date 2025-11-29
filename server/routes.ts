@@ -387,13 +387,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/predictions", async (req, res) => {
+  app.post("/api/predictions", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub;
-      if (!userId) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
+      const userId = req.user.claims.sub;
+      
       const predictionData = insertPredictionSchema.parse({ ...req.body, userId });
       const prediction = await storage.createPrediction(predictionData);
       res.json(prediction);
