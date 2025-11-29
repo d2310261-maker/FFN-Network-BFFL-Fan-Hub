@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { TEAMS } from "@/lib/nflTeams";
 import { RotateCcw } from "lucide-react";
 import type { PlayoffMatch } from "@shared/schema";
 
@@ -23,6 +22,25 @@ interface BracketMatch {
   side: "left" | "right";
   position: number;
 }
+
+const TEAMS = {
+  "Atlanta Falcons": "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png",
+  "Tampa Bay Buccaneers": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png",
+  "Jacksonville Jaguars": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png",
+  "Los Angeles Rams": "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png",
+  "Baltimore Ravens": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png",
+  "Miami Dolphins": "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png",
+  "Chicago Bears": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png",
+  "Houston Texans": "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png",
+  "New Orleans Saints": "https://a.espncdn.com/i/teamlogos/nfl/500/no.png",
+  "San Francisco 49ers": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png",
+  "Kansas City Chiefs": "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png",
+  "Detroit Lions": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png",
+  "Philadelphia Eagles": "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png",
+  "Arizona Cardinals": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png",
+  "Dallas Cowboys": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png",
+  "Buffalo Bills": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png",
+};
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
@@ -164,7 +182,7 @@ export default function Playoffs() {
     return (
       <div className="border border-border bg-card px-3 py-2 min-w-40 text-xs font-medium flex items-center gap-2" data-testid={isTeam1 ? `team1-${matchId}` : `team2-${matchId}`}>
         {logoUrl && (
-          <img src={logoUrl} alt={team?.name} className="w-6 h-6 object-contain flex-shrink-0" onError={(e) => e.currentTarget.style.display = 'none'} />
+          <img src={logoUrl} alt={team?.name} className="w-6 h-6 object-contain flex-shrink-0" />
         )}
         <div className="flex-1 min-w-0">
           {isAuthenticated ? (
@@ -178,7 +196,7 @@ export default function Playoffs() {
                 {AVAILABLE_TEAMS.map((t) => (
                   <SelectItem key={t} value={t}>
                     <div className="flex items-center gap-2">
-                      <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+                      <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" />
                       <span>{t}</span>
                     </div>
                   </SelectItem>
