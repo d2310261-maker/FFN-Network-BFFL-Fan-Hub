@@ -19,6 +19,7 @@ interface StandingsEntry {
   losses: number;
   pointDifferential?: number;
   division: "D1" | "D2" | "D3" | "D4";
+  manualOrder?: number;
 }
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
@@ -41,7 +42,7 @@ export default function Standings() {
   useEffect(() => {
     if (dbStandings) {
       setStandings(
-        dbStandings.map((s: any) => ({
+        dbStandings.map((s: any, idx: number) => ({
           id: s.id,
           rank: 0,
           team: s.team,
@@ -49,6 +50,7 @@ export default function Standings() {
           losses: s.losses,
           pointDifferential: s.pointDifferential,
           division: s.division,
+          manualOrder: idx,
         }))
       );
     }
@@ -122,6 +124,11 @@ export default function Standings() {
     return [...standings]
       .filter((entry) => entry.division === division)
       .sort((a, b) => {
+        // First sort by manual order if set
+        const aOrder = a.manualOrder ?? 999;
+        const bOrder = b.manualOrder ?? 999;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        // Fallback to wins/losses
         const aWins = a.wins;
         const bWins = b.wins;
         if (aWins !== bWins) return bWins - aWins;
@@ -151,21 +158,12 @@ export default function Standings() {
       return;
     }
 
-    // Find their indices in the division standings
-    const division = draggedEntry.division;
-    const divisionTeams = getDivisionStandings(division);
-    const draggedIdx = divisionTeams.findIndex(e => e.id === draggedTeam);
-    const targetIdx = divisionTeams.findIndex(e => e.id === targetTeamId);
-
-    // Swap in the division standings
-    const newDivisionTeams = [...divisionTeams];
-    [newDivisionTeams[draggedIdx], newDivisionTeams[targetIdx]] = 
-    [newDivisionTeams[targetIdx], newDivisionTeams[draggedIdx]];
-
-    // Update the main standings array
+    // Swap the manualOrder values between dragged and target teams
     const newStandings = standings.map(entry => {
-      if (entry.division === division) {
-        return newDivisionTeams.find(t => t.id === entry.id) || entry;
+      if (entry.id === draggedTeam) {
+        return { ...entry, manualOrder: targetEntry.manualOrder };
+      } else if (entry.id === targetTeamId) {
+        return { ...entry, manualOrder: draggedEntry.manualOrder };
       }
       return entry;
     });
