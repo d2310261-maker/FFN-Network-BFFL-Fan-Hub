@@ -8,9 +8,8 @@ import express, {
 } from "express";
 
 import { registerRoutes } from "./routes";
-import { db } from "./db";
+import { db, rawSql } from "./db";
 import { games, news, chatMessages, pickems, pickemRules, standings, playoffMatches, sessions } from "@shared/schema";
-import { sql } from "drizzle-orm";
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -76,16 +75,16 @@ export default async function runApp(
       console.log('Initializing database schema...');
       
       // Create sessions table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS sessions (
           sid VARCHAR PRIMARY KEY,
           sess JSONB NOT NULL,
           expire TIMESTAMP NOT NULL
         )
-      `);
+      `;
       
       // Create users table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           email VARCHAR UNIQUE,
@@ -95,10 +94,10 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create games table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS games (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           week INTEGER NOT NULL,
@@ -114,10 +113,10 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create news table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS news (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           title VARCHAR(300) NOT NULL,
@@ -127,10 +126,10 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create chat_messages table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS chat_messages (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           username VARCHAR(100) NOT NULL,
@@ -138,10 +137,10 @@ export default async function runApp(
           game_id VARCHAR,
           created_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create pickems table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS pickems (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           week INTEGER NOT NULL UNIQUE,
@@ -149,19 +148,19 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create pickem_rules table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS pickem_rules (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           content TEXT NOT NULL,
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create standings table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS standings (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           team VARCHAR(100) NOT NULL,
@@ -172,53 +171,30 @@ export default async function runApp(
           manual_order INTEGER,
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Migrate standings table: rename ties to point_differential if needed
       try {
-        const columnCheck = await db.execute(sql`
-          SELECT EXISTS (
-            SELECT 1 FROM information_schema.columns 
-            WHERE table_name = 'standings' AND column_name = 'ties'
-          )
-        `);
-        
-        if (columnCheck.rows && columnCheck.rows[0]?.exists) {
-          // Rename ties to point_differential
-          await db.execute(sql`
-            ALTER TABLE standings RENAME COLUMN ties TO point_differential
-          `);
-          console.log('Migrated standings table: ties → point_differential');
-        }
+        await rawSql`
+          ALTER TABLE standings RENAME COLUMN ties TO point_differential
+        `;
+        console.log('Migrated standings table: ties → point_differential');
       } catch (err: any) {
-        if (!err.message?.includes('already exists') && !err.message?.includes('does not exist')) {
-          console.warn('Migration check warning:', err.message);
-        }
+        // Column already renamed or doesn't exist - that's fine, ignore silently
       }
       
       // Add manual_order column if it doesn't exist
       try {
-        const manualOrderCheck = await db.execute(sql`
-          SELECT EXISTS (
-            SELECT 1 FROM information_schema.columns 
-            WHERE table_name = 'standings' AND column_name = 'manual_order'
-          )
-        `);
-        
-        if (!manualOrderCheck.rows || !manualOrderCheck.rows[0]?.exists) {
-          await db.execute(sql`
-            ALTER TABLE standings ADD COLUMN manual_order INTEGER
-          `);
-          console.log('Added manual_order column to standings table');
-        }
+        await rawSql`
+          ALTER TABLE standings ADD COLUMN manual_order INTEGER
+        `;
+        console.log('Added manual_order column to standings table');
       } catch (err: any) {
-        if (!err.message?.includes('already exists') && !err.message?.includes('does not exist')) {
-          console.warn('Column addition warning:', err.message);
-        }
+        // Column might already exist - that's fine, ignore silently
       }
       
       // Create playoff_matches table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS playoff_matches (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           round VARCHAR(50) NOT NULL,
@@ -234,10 +210,10 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create changelogs table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS changelogs (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           version VARCHAR(20) NOT NULL UNIQUE,
@@ -249,17 +225,17 @@ export default async function runApp(
           created_at TIMESTAMP DEFAULT NOW(),
           updated_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       // Create predictions table
-      await db.execute(sql`
+      await rawSql`
         CREATE TABLE IF NOT EXISTS predictions (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           game_id VARCHAR NOT NULL,
           voted_for VARCHAR(100) NOT NULL,
           created_at TIMESTAMP DEFAULT NOW()
         )
-      `);
+      `;
       
       console.log('Database schema initialized successfully');
     }

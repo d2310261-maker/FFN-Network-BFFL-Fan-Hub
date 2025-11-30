@@ -12,3 +12,4 @@ if (!process.env.DATABASE_URL) {
 // It works with both Neon and standard PostgreSQL connections
 const sql = postgres(process.env.DATABASE_URL);
 export const db = drizzle({ client: sql, schema });
+export const rawSql = sql;
