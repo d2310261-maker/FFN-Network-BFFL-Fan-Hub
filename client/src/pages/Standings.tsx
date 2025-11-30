@@ -42,7 +42,7 @@ export default function Standings() {
   useEffect(() => {
     if (dbStandings) {
       setStandings(
-        dbStandings.map((s: any, idx: number) => ({
+        dbStandings.map((s: any) => ({
           id: s.id,
           rank: 0,
           team: s.team,
@@ -50,7 +50,7 @@ export default function Standings() {
           losses: s.losses,
           pointDifferential: s.pointDifferential,
           division: s.division,
-          manualOrder: idx,
+          manualOrder: s.manualOrder,
         }))
       );
     }
@@ -64,6 +64,7 @@ export default function Standings() {
         wins: entry.wins,
         losses: entry.losses,
         pointDifferential: entry.pointDifferential,
+        manualOrder: entry.manualOrder,
       });
     },
     onSuccess: () => {
@@ -88,6 +89,10 @@ export default function Standings() {
 
   const addTeam = () => {
     if (!isAuthenticated || !newTeam.trim()) return;
+    const divisionTeams = standings.filter(s => s.division === newDivision);
+    const maxOrder = divisionTeams.length > 0 
+      ? Math.max(...divisionTeams.map(s => s.manualOrder ?? -1)) 
+      : -1;
     const newEntry: StandingsEntry = {
       id: Date.now().toString(),
       rank: standings.length + 1,
@@ -96,6 +101,7 @@ export default function Standings() {
       losses: 0,
       pointDifferential: 0,
       division: newDivision,
+      manualOrder: maxOrder + 1,
     };
     setStandings([...standings, newEntry]);
     upsertMutation.mutate(newEntry);
@@ -124,15 +130,9 @@ export default function Standings() {
     return [...standings]
       .filter((entry) => entry.division === division)
       .sort((a, b) => {
-        // First sort by manual order if set
         const aOrder = a.manualOrder ?? 999;
         const bOrder = b.manualOrder ?? 999;
-        if (aOrder !== bOrder) return aOrder - bOrder;
-        // Fallback to wins/losses
-        const aWins = a.wins;
-        const bWins = b.wins;
-        if (aWins !== bWins) return bWins - aWins;
-        return a.losses - b.losses;
+        return aOrder - bOrder;
       });
   };
 
@@ -169,6 +169,13 @@ export default function Standings() {
     });
 
     setStandings(newStandings);
+    
+    // Save both swapped entries to backend immediately
+    const newDraggedEntry = newStandings.find(e => e.id === draggedTeam);
+    const newTargetEntry = newStandings.find(e => e.id === targetTeamId);
+    if (newDraggedEntry) upsertMutation.mutate(newDraggedEntry);
+    if (newTargetEntry) upsertMutation.mutate(newTargetEntry);
+    
     setDraggedTeam(null);
   };
 

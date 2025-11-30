@@ -143,6 +143,7 @@ export const standings = pgTable("standings", {
   wins: integer("wins").default(0),
   losses: integer("losses").default(0),
   pointDifferential: integer("point_differential").default(0),
+  manualOrder: integer("manual_order"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
