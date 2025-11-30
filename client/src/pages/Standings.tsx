@@ -32,6 +32,7 @@ export default function Standings() {
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"D1" | "D2" | "D3" | "D4">("D1");
   const [editingPD, setEditingPD] = useState<Record<string, string>>({});
+  const [draggedTeam, setDraggedTeam] = useState<string | null>(null);
 
   const { data: dbStandings, isLoading } = useQuery({
     queryKey: ["/api/standings"],
@@ -128,6 +129,55 @@ export default function Standings() {
       });
   };
 
+  const handleDragStart = (e: React.DragEvent, teamId: string) => {
+    setDraggedTeam(teamId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTeamId: string) => {
+    e.preventDefault();
+    if (draggedTeam === targetTeamId || !draggedTeam) return;
+
+    const draggedEntry = standings.find(e => e.id === draggedTeam);
+    const targetEntry = standings.find(e => e.id === targetTeamId);
+    
+    if (!draggedEntry || !targetEntry || draggedEntry.division !== targetEntry.division) {
+      setDraggedTeam(null);
+      return;
+    }
+
+    // Find their indices in the division standings
+    const division = draggedEntry.division;
+    const divisionTeams = getDivisionStandings(division);
+    const draggedIdx = divisionTeams.findIndex(e => e.id === draggedTeam);
+    const targetIdx = divisionTeams.findIndex(e => e.id === targetTeamId);
+
+    // Swap in the division standings
+    const newDivisionTeams = [...divisionTeams];
+    [newDivisionTeams[draggedIdx], newDivisionTeams[targetIdx]] = 
+    [newDivisionTeams[targetIdx], newDivisionTeams[draggedIdx]];
+
+    // Update the main standings array
+    const newStandings = standings.map(entry => {
+      if (entry.division === division) {
+        return newDivisionTeams.find(t => t.id === entry.id) || entry;
+      }
+      return entry;
+    });
+
+    setStandings(newStandings);
+    setDraggedTeam(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTeam(null);
+  };
+
   const getUsedTeams = standings.map(s => s.team);
   const availableTeams = AVAILABLE_TEAMS.filter(t => !getUsedTeams.includes(t));
 
@@ -212,7 +262,16 @@ export default function Standings() {
                       </thead>
                       <tbody className="divide-y">
                         {divisionStandings.map((entry, index) => (
-                          <tr key={entry.id} data-testid={`row-team-${entry.id}`}>
+                          <tr 
+                            key={entry.id} 
+                            data-testid={`row-team-${entry.id}`}
+                            draggable={isAuthenticated}
+                            onDragStart={(e) => handleDragStart(e, entry.id)}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, entry.id)}
+                            onDragEnd={handleDragEnd}
+                            className={`cursor-move transition-all ${draggedTeam === entry.id ? 'opacity-50 bg-muted' : draggedTeam && draggedTeam !== entry.id ? 'hover:bg-accent/50' : ''}`}
+                          >
                             <td className="px-6 py-4 text-sm font-bold">{index + 1}</td>
                             <td className="px-6 py-4 text-sm font-semibold">
                               <div className="flex items-center gap-3">
