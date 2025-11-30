@@ -31,6 +31,7 @@ export default function Standings() {
   const [standings, setStandings] = useState<StandingsEntry[]>([]);
   const [newTeam, setNewTeam] = useState("");
   const [newDivision, setNewDivision] = useState<"D1" | "D2" | "D3" | "D4">("D1");
+  const [editingPD, setEditingPD] = useState<Record<string, string>>({});
 
   const { data: dbStandings, isLoading } = useQuery({
     queryKey: ["/api/standings"],
@@ -256,11 +257,20 @@ export default function Standings() {
                             <td className="px-6 py-4 text-sm">
                               {isAuthenticated ? (
                                 <Input
-                                  type="number"
-                                  value={entry.pointDifferential || 0}
-                                  onChange={(e) =>
-                                    updateEntry(entry.id, "pointDifferential", parseInt(e.target.value) || 0)
-                                  }
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={editingPD[entry.id] !== undefined ? editingPD[entry.id] : (entry.pointDifferential || 0)}
+                                  onChange={(e) => {
+                                    setEditingPD({ ...editingPD, [entry.id]: e.target.value });
+                                  }}
+                                  onBlur={(e) => {
+                                    const val = e.target.value;
+                                    const numVal = val === '' || val === '-' ? 0 : parseInt(val);
+                                    if (!isNaN(numVal)) {
+                                      updateEntry(entry.id, "pointDifferential", numVal);
+                                    }
+                                    setEditingPD({ ...editingPD, [entry.id]: undefined });
+                                  }}
                                   className="w-16 text-center"
                                   data-testid={`input-pd-${entry.id}`}
                                 />
