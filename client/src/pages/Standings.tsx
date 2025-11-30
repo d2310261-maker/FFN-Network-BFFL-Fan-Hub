@@ -261,10 +261,13 @@ export default function Standings() {
                                   value={entry.pointDifferential || 0}
                                   onChange={(e) => {
                                     const val = e.target.value;
-                                    // Allow empty string or valid integers (including negative)
-                                    if (val === '' || val === '-' || /^-?\d+$/.test(val)) {
-                                      updateEntry(entry.id, "pointDifferential", val === '' ? 0 : parseInt(val));
+                                    // Only update if it's a valid complete number (including negative)
+                                    if (val === '') {
+                                      updateEntry(entry.id, "pointDifferential", 0);
+                                    } else if (/^-?\d+$/.test(val)) {
+                                      updateEntry(entry.id, "pointDifferential", parseInt(val));
                                     }
+                                    // Allow typing intermediate states like "-" but don't process them
                                   }}
                                   className="w-16 text-center"
                                   data-testid={`input-pd-${entry.id}`}
