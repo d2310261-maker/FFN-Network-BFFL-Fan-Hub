@@ -168,7 +168,8 @@ export default async function runApp(
           division VARCHAR(10) NOT NULL,
           wins INTEGER DEFAULT 0,
           losses INTEGER DEFAULT 0,
-          ties INTEGER DEFAULT 0,
+          point_differential INTEGER DEFAULT 0,
+          manual_order INTEGER,
           updated_at TIMESTAMP DEFAULT NOW()
         )
       `);
