@@ -71,8 +71,8 @@ export default async function runApp(
 ) {
   // Auto-initialize database schema if tables don't exist (for Render compatibility)
   try {
-    if (process.env.NODE_ENV === 'production') {
-      console.log('Initializing database schema...');
+    // Run migrations in both dev and production
+    console.log('Initializing database schema...');
       
       // Create sessions table
       await rawSql`
@@ -237,8 +237,7 @@ export default async function runApp(
         )
       `;
       
-      console.log('Database schema initialized successfully');
-    }
+    console.log('Database schema initialized successfully');
   } catch (error: any) {
     // Tables may already exist - that's fine
     if (!error.message?.includes('already exists')) {
