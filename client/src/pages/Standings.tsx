@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
+import { Trash2, GripVertical } from "lucide-react";
 import { TEAMS } from "@/lib/teams";
 
 interface StandingsEntry {
@@ -250,7 +250,8 @@ export default function Standings() {
                     <table className="w-full">
                       <thead className="bg-muted border-b">
                         <tr>
-                          <th className="px-6 py-3 text-left text-sm font-semibold">Rank</th>
+                          <th className="px-2 py-3 text-center text-sm font-semibold w-10"></th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold">Rank</th>
                           <th className="px-6 py-3 text-left text-sm font-semibold">Team</th>
                           <th className="px-6 py-3 text-center text-sm font-semibold">Wins</th>
                           <th className="px-6 py-3 text-center text-sm font-semibold">Losses</th>
@@ -263,14 +264,24 @@ export default function Standings() {
                           <tr 
                             key={entry.id} 
                             data-testid={`row-team-${entry.id}`}
-                            draggable={isAuthenticated}
-                            onDragStart={(e) => handleDragStart(e, entry.id)}
                             onDragOver={handleDragOver}
                             onDrop={(e) => handleDrop(e, entry.id)}
-                            onDragEnd={handleDragEnd}
-                            className={`cursor-move transition-all ${draggedTeam === entry.id ? 'opacity-50 bg-muted' : draggedTeam && draggedTeam !== entry.id ? 'hover:bg-accent/50' : ''}`}
+                            className={`transition-all ${draggedTeam === entry.id ? 'opacity-50 bg-muted' : draggedTeam && draggedTeam !== entry.id ? 'hover:bg-accent/50' : ''}`}
                           >
-                            <td className="px-6 py-4 text-sm font-bold">{index + 1}</td>
+                            <td className="px-2 py-4 text-center">
+                              {isAuthenticated && (
+                                <div 
+                                  draggable
+                                  onDragStart={(e) => handleDragStart(e, entry.id)}
+                                  onDragEnd={handleDragEnd}
+                                  className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center hover:text-primary transition-colors"
+                                  data-testid={`drag-handle-${entry.id}`}
+                                >
+                                  <GripVertical className="w-5 h-5" />
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-bold">{index + 1}</td>
                             <td className="px-6 py-4 text-sm font-semibold">
                               <div className="flex items-center gap-3">
                                 {TEAMS[entry.team as keyof typeof TEAMS] && (
