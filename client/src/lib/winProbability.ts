@@ -25,18 +25,18 @@ export function calculateWinProbability(
   if (game.quarter && game.quarter !== "Scheduled") {
     const scoreDifference = game.team1Score! - game.team2Score!;
     
-    // Score impact increases as game progresses
+    // Quarter weight multiplier - increases with game progress
     const quarterMap: { [key: string]: number } = {
-      "Q1": 0.25,
-      "Q2": 0.4,
-      "Q3": 0.6,
-      "Q4": 0.8,
+      "Q1": 0.3,
+      "Q2": 0.5,
+      "Q3": 0.75,
+      "Q4": 1.0,
     };
     
-    const quarterProgress = quarterMap[game.quarter] || 0.5;
+    const quarterWeight = quarterMap[game.quarter] || 0.5;
     
-    // Score difference contribution: each 3 points = 3% swing
-    const scoreImpact = (scoreDifference / 3) * quarterProgress;
+    // Score impact is more realistic: every 7 points = ~10% swing in later quarters
+    const scoreImpact = (scoreDifference / 7) * 10 * quarterWeight;
     probability += scoreImpact;
   }
   

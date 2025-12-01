@@ -25,12 +25,20 @@ export default function GameDetail() {
   const confettiTimeoutsRef = useRef<number[]>([]);
   const { user } = useAuth();
 
-  const { data: game, isLoading: gameLoading, error: gameError } = useQuery<Game>({
+  const { data: game, isLoading: gameLoading, error: gameError, refetch } = useQuery<Game>({
     queryKey: ["/api/games", gameId],
     enabled: !!gameId,
-    refetchInterval: 3000,
+    refetchInterval: 2000,
     staleTime: 0,
+    gcTime: 0,
   });
+  
+  // Force refetch when component mounts or gameId changes
+  useEffect(() => {
+    if (gameId) {
+      refetch();
+    }
+  }, [gameId, refetch]);
 
   const { data: initialMessages } = useQuery<ChatMessage[]>({
     queryKey: ["/api/chat", gameId],
