@@ -29,43 +29,106 @@ function Router() {
     return null;
   }
 
+  const christmasElements = Array.from({ length: 80 }).map((_, i) => {
+    const type = i % 4;
+    let content = '❄';
+    if (type === 1) content = '🎄';
+    if (type === 2) content = '🎅';
+    if (type === 3) content = '🎁';
+    
+    return (
+      <div
+        key={i}
+        className="absolute select-none font-bold"
+        style={{
+          fontSize: Math.random() * 24 + 12 + 'px',
+          left: Math.random() * 100 + '%',
+          animation: i % 2 === 0 ? `snowfall ${Math.random() * 12 + 8}s linear infinite` : `snowfall-2 ${Math.random() * 12 + 8}s linear infinite`,
+          animationDelay: Math.random() * 5 + 's',
+          top: -40 + 'px',
+          opacity: Math.random() * 0.4 + 0.6,
+        }}
+      >
+        {content}
+      </div>
+    );
+  });
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Festive snowflakes */}
-      <div className="fixed inset-0 pointer-events-none">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-white opacity-80 select-none font-bold"
-            style={{
-              fontSize: Math.random() * 20 + 10 + 'px',
-              left: Math.random() * 100 + '%',
-              animation: i % 2 === 0 ? `snowfall ${Math.random() * 10 + 8}s linear infinite` : `snowfall-2 ${Math.random() * 10 + 8}s linear infinite`,
-              animationDelay: Math.random() * 5 + 's',
-              top: -20 + 'px',
-              color: i % 3 === 0 ? 'hsl(0 78% 48%)' : i % 3 === 1 ? 'hsl(43 96% 56%)' : 'hsl(34 25% 96%)',
-            }}
-          >
-            ❄
-          </div>
-        ))}
-      </div>
-
-      {/* Twinkling lights border */}
-      <div className="fixed top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 via-yellow-400 via-green-600 to-red-500 z-50 opacity-80">
-        <div className="flex justify-around h-full">
-          {Array.from({ length: 30 }).map((_, i) => (
+      {/* Top twinkling lights */}
+      <div className="fixed top-0 left-0 right-0 h-3 z-50 pointer-events-none">
+        <div className="flex justify-around h-full gap-1 px-2">
+          {Array.from({ length: 50 }).map((_, i) => (
             <div
-              key={i}
-              className="w-1 rounded-full"
+              key={`top-${i}`}
+              className="flex-1 rounded-full"
               style={{
-                animation: `twinkle ${1 + (i % 3) * 0.5}s ease-in-out infinite`,
-                animationDelay: (i * 0.1) + 's',
+                animation: `twinkle ${0.8 + (i % 4) * 0.3}s ease-in-out infinite`,
+                animationDelay: (i * 0.08) + 's',
                 backgroundColor: i % 3 === 0 ? 'hsl(0 78% 48%)' : i % 3 === 1 ? 'hsl(43 96% 56%)' : 'hsl(138 44% 32%)',
+                boxShadow: `0 0 8px currentColor`,
               }}
             />
           ))}
         </div>
+      </div>
+
+      {/* Bottom twinkling lights */}
+      <div className="fixed bottom-0 left-0 right-0 h-3 z-50 pointer-events-none">
+        <div className="flex justify-around h-full gap-1 px-2">
+          {Array.from({ length: 50 }).map((_, i) => (
+            <div
+              key={`bottom-${i}`}
+              className="flex-1 rounded-full"
+              style={{
+                animation: `twinkle ${0.8 + (i % 4) * 0.3}s ease-in-out infinite`,
+                animationDelay: (i * 0.08 + 0.4) + 's',
+                backgroundColor: i % 3 === 1 ? 'hsl(0 78% 48%)' : i % 3 === 2 ? 'hsl(43 96% 56%)' : 'hsl(138 44% 32%)',
+                boxShadow: `0 0 8px currentColor`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Left side lights */}
+      <div className="fixed left-0 top-0 bottom-0 w-2 z-40 pointer-events-none flex flex-col justify-around">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div
+            key={`left-${i}`}
+            className="w-full rounded-full"
+            style={{
+              animation: `twinkle-delayed ${1 + (i % 3) * 0.4}s ease-in-out infinite`,
+              animationDelay: (i * 0.12) + 's',
+              backgroundColor: i % 3 === 0 ? 'hsl(0 78% 48%)' : i % 3 === 1 ? 'hsl(43 96% 56%)' : 'hsl(138 44% 32%)',
+              boxShadow: `0 0 10px currentColor`,
+              height: '6px',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Right side lights */}
+      <div className="fixed right-0 top-0 bottom-0 w-2 z-40 pointer-events-none flex flex-col justify-around">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div
+            key={`right-${i}`}
+            className="w-full rounded-full"
+            style={{
+              animation: `twinkle-delayed ${1 + (i % 3) * 0.4}s ease-in-out infinite`,
+              animationDelay: (i * 0.12 + 0.5) + 's',
+              backgroundColor: i % 3 === 1 ? 'hsl(0 78% 48%)' : i % 3 === 2 ? 'hsl(43 96% 56%)' : 'hsl(138 44% 32%)',
+              boxShadow: `0 0 10px currentColor`,
+              height: '6px',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Falling festive elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {christmasElements}
       </div>
 
       <Header />
