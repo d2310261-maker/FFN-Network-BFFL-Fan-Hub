@@ -322,13 +322,19 @@ export default function Playoffs() {
           </div>
 
           {/* DIVISIONAL COLUMN */}
-          <div className="flex flex-col gap-4">
-            {divMatches.map((match) => (
-              <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
-                <MatchBox match={match} isTeam1={true} team={match.team1} />
-                <MatchBox match={match} isTeam1={false} team={match.team2} />
-              </div>
-            ))}
+          <div className="flex flex-col">
+            {/* Match 1 */}
+            <div className="flex flex-col gap-0.5" data-testid={`card-match-${divMatches[0]?.id}`}>
+              <MatchBox match={divMatches[0]!} isTeam1={true} team={divMatches[0]?.team1} />
+              <MatchBox match={divMatches[0]!} isTeam1={false} team={divMatches[0]?.team2} />
+            </div>
+            <div className="h-12" />
+            
+            {/* Match 2 */}
+            <div className="flex flex-col gap-0.5" data-testid={`card-match-${divMatches[1]?.id}`}>
+              <MatchBox match={divMatches[1]!} isTeam1={true} team={divMatches[1]?.team1} />
+              <MatchBox match={divMatches[1]!} isTeam1={false} team={divMatches[1]?.team2} />
+            </div>
           </div>
 
           {/* CONFERENCE COLUMN */}
