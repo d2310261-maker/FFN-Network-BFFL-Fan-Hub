@@ -29,6 +29,7 @@ export default function GameDetail() {
     queryKey: ["/api/games", gameId],
     enabled: !!gameId,
     refetchInterval: 3000,
+    staleTime: 0,
   });
 
   const { data: initialMessages } = useQuery<ChatMessage[]>({

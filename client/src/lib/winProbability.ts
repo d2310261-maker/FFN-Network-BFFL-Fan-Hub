@@ -21,8 +21,8 @@ export function calculateWinProbability(
   const pdDifference = team1PD - team2PD;
   let probability = 50 + (pdDifference / 20); // Each 20 points PD = 10% swing
   
-  // During live games, factor in current score
-  if (game.isLive && game.quarter && game.quarter !== "Scheduled") {
+  // Factor in score if game has started (quarter is not "Scheduled")
+  if (game.quarter && game.quarter !== "Scheduled") {
     const scoreDifference = game.team1Score! - game.team2Score!;
     
     // Score impact increases as game progresses
