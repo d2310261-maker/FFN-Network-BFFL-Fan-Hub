@@ -28,7 +28,7 @@ export default function GameDetail() {
   const { data: game, isLoading: gameLoading, error: gameError } = useQuery<Game>({
     queryKey: ["/api/games", gameId],
     enabled: !!gameId,
-    refetchInterval: 15000,
+    refetchInterval: 3000,
   });
 
   const { data: initialMessages } = useQuery<ChatMessage[]>({
