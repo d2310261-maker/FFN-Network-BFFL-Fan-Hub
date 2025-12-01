@@ -40,8 +40,8 @@ export function calculateWinProbability(
     probability += scoreImpact;
   }
   
-  // Cap between 15% and 85%
-  probability = Math.max(15, Math.min(85, Math.round(probability)));
+  // Cap between 1% and 99% (allow extreme differentials to show)
+  probability = Math.max(1, Math.min(99, Math.round(probability)));
   
   // Return probability for the requested team
   if (team === "team1") {
