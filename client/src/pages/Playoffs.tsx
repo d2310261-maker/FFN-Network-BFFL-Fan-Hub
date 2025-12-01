@@ -32,6 +32,14 @@ const SEED_PAIRINGS = [
   { seeds: [7, 10], matchNumber: 4 },
 ];
 
+// Top 4 seeds divisional matchups
+const TOP_SEEDS_DIVISIONAL = [
+  { seeds: [1, 8], matchNumber: 1 },  // #1 seed vs wildcard winner (8/9)
+  { seeds: [4, 5], matchNumber: 2 },  // #4 seed vs wildcard winner (5/12)
+  { seeds: [2, 7], matchNumber: 3 },  // #2 seed vs wildcard winner (7/10)
+  { seeds: [3, 6], matchNumber: 4 },  // #3 seed vs wildcard winner (6/11)
+];
+
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [seeds, setSeeds] = useState<BracketTeam[]>(
@@ -103,6 +111,48 @@ export default function Playoffs() {
     setMatches(newMatches);
   }, [dbMatches]);
 
+  // Populate bracket when seeds change
+  useEffect(() => {
+    const populatedMatches = matches.map((match) => {
+      // Wildcard round - seeds 5-12
+      if (match.round === "wildcard") {
+        const pairing = SEED_PAIRINGS.find(p => p.matchNumber === match.matchNumber);
+        if (pairing) {
+          const seed1 = seeds[pairing.seeds[0] - 1];
+          const seed2 = seeds[pairing.seeds[1] - 1];
+          return {
+            ...match,
+            team1: seed1?.name ? { id: `${match.id}-t1`, name: seed1.name, seed: seed1.seed } : undefined,
+            team2: seed2?.name ? { id: `${match.id}-t2`, name: seed2.name, seed: seed2.seed } : undefined,
+          };
+        }
+      }
+      
+      // Divisional round - top 4 seeds + wildcard winners
+      if (match.round === "divisional") {
+        const pairing = TOP_SEEDS_DIVISIONAL.find(p => p.matchNumber === match.matchNumber);
+        if (pairing) {
+          const seed1 = seeds[pairing.seeds[0] - 1];
+          const seed2 = seeds[pairing.seeds[1] - 1];
+          const team1 = seed1?.name ? { id: `${match.id}-t1`, name: seed1.name, seed: seed1.seed } : undefined;
+          
+          // Seed 2 slot is wildcard winner - use whoever it is or the seed
+          const team2 = seed2?.name ? { id: `${match.id}-t2`, name: seed2.name, seed: seed2.seed } : undefined;
+          
+          return {
+            ...match,
+            team1,
+            team2,
+          };
+        }
+      }
+      
+      return match;
+    });
+    
+    setMatches(populatedMatches);
+  }, [seeds]);
+
   const updateMutation = useMutation({
     mutationFn: async (data: { id: string; team1?: string; team2?: string; winner?: string }) => {
       const res = await apiRequest("PATCH", `/api/playoffs/${data.id}`, {
@@ -139,10 +189,35 @@ export default function Playoffs() {
     }
   };
 
+  const updateSeed = (seedNumber: number, teamName: string) => {
+    const updatedSeeds = seeds.map((s) =>
+      s.seed === seedNumber ? { ...s, name: teamName } : s
+    );
+    setSeeds(updatedSeeds);
+  };
+
   const SeedBox = ({ seed }: { seed: BracketTeam }) => (
     <div className="border-2 border-border bg-card px-2 py-1 w-40 text-xs font-bold flex items-center gap-2 h-9 rounded" data-testid={`seed-${seed.seed}`}>
       <span className="text-muted-foreground text-xs">#{seed.seed}</span>
-      <span className="truncate flex-1">{seed.name || "—"}</span>
+      {isAuthenticated ? (
+        <Select value={seed.name || ""} onValueChange={(value) => updateSeed(seed.seed, value)}>
+          <SelectTrigger className="h-5 border-0 p-0 text-xs bg-transparent focus:ring-0 flex-1">
+            <SelectValue placeholder="—" />
+          </SelectTrigger>
+          <SelectContent>
+            {AVAILABLE_TEAMS.map((t) => (
+              <SelectItem key={t} value={t}>
+                <div className="flex items-center gap-2">
+                  <img src={TEAMS[t as keyof typeof TEAMS]} alt={t} className="w-4 h-4 object-contain" />
+                  <span>{t}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <span className="truncate flex-1">{seed.name || "—"}</span>
+      )}
     </div>
   );
 
