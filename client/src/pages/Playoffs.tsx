@@ -26,6 +26,14 @@ interface BracketMatch {
 
 const AVAILABLE_TEAMS = Object.keys(TEAMS);
 
+// Seed pairings for wildcard round
+const SEED_PAIRINGS = [
+  { seeds: [5, 12], matchNumber: 1 },
+  { seeds: [8, 9], matchNumber: 2 },
+  { seeds: [6, 11], matchNumber: 3 },
+  { seeds: [7, 10], matchNumber: 4 },
+];
+
 export default function Playoffs() {
   const { isAuthenticated } = useAuth();
   const [seeds, setSeeds] = useState<BracketTeam[]>(
@@ -149,20 +157,27 @@ export default function Playoffs() {
     }
   };
 
-  const TeamBox = ({ team, matchId, isTeam1 }: { team?: BracketTeam; matchId: string; isTeam1: boolean }) => {
+  const SeedBox = ({ seed }: { seed: BracketTeam }) => (
+    <div className="border-2 border-border bg-card px-2 py-1 min-w-32 text-xs font-bold flex items-center gap-2 h-9 rounded" data-testid={`seed-${seed.seed}`}>
+      <span className="text-muted-foreground text-xs">#{seed.seed}</span>
+      <span className="truncate">{seed.name || "—"}</span>
+    </div>
+  );
+
+  const MatchBox = ({ match, isTeam1, team }: { match: BracketMatch; isTeam1: boolean; team?: BracketTeam }) => {
     const logoUrl = team ? TEAMS[team.name as keyof typeof TEAMS] : undefined;
     
     return (
-      <div className="border border-border bg-card px-3 py-2 min-w-40 text-xs font-medium flex items-center gap-2 h-10 rounded" data-testid={isTeam1 ? `team1-${matchId}` : `team2-${matchId}`}>
+      <div className="border border-border bg-card px-2 py-1 min-w-40 text-xs font-medium flex items-center gap-2 h-9 rounded" data-testid={isTeam1 ? `team1-${match.id}` : `team2-${match.id}`}>
         {logoUrl && (
-          <img src={logoUrl} alt={team?.name} className="w-5 h-5 object-contain flex-shrink-0" />
+          <img src={logoUrl} alt={team?.name} className="w-4 h-4 object-contain flex-shrink-0" />
         )}
         <div className="flex-1 min-w-0">
           {isAuthenticated ? (
             <Select value={team?.name || ""} onValueChange={(value) => {
-              updateMatch(matchId, isTeam1, value);
+              updateMatch(match.id, isTeam1, value);
             }}>
-              <SelectTrigger className="h-5 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={isTeam1 ? `input-team1-${matchId}` : `input-team2-${matchId}`}>
+              <SelectTrigger className="h-5 border-0 p-0 text-xs bg-transparent focus:ring-0" data-testid={isTeam1 ? `input-team1-${match.id}` : `input-team2-${match.id}`}>
                 <SelectValue placeholder="—" />
               </SelectTrigger>
               <SelectContent>
@@ -184,23 +199,8 @@ export default function Playoffs() {
     );
   };
 
-  const MatchColumn = ({ round, title }: { round: "wildcard" | "divisional" | "conference" | "super_bowl"; title: string }) => {
-    const roundMatches = matches.filter((m) => m.round === round);
-    const spacing = round === "wildcard" ? "gap-8" : round === "divisional" ? "gap-12" : round === "conference" ? "gap-20" : "gap-32";
-    
-    return (
-      <div className="flex flex-col items-center">
-        <div className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider">{title}</div>
-        <div className={`flex flex-col ${spacing}`}>
-          {roundMatches.map((match) => (
-            <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
-              <TeamBox team={match.team1} matchId={match.id} isTeam1={true} />
-              <TeamBox team={match.team2} matchId={match.id} isTeam1={false} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const getMatchesForRound = (round: "wildcard" | "divisional" | "conference" | "super_bowl") => {
+    return matches.filter((m) => m.round === round).sort((a, b) => a.matchNumber - b.matchNumber);
   };
 
   return (
@@ -224,29 +224,75 @@ export default function Playoffs() {
       </div>
 
       <div className="overflow-x-auto px-4">
-        <div className="flex gap-6 items-start min-w-max pb-8">
-          {/* Seeds Column */}
-          <div className="flex flex-col items-center">
-            <div className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider">Seeds</div>
-            <div className="flex flex-col gap-8">
-              {seeds.map((seed) => (
-                <div
-                  key={seed.id}
-                  className="border border-border bg-card px-3 py-2 min-w-40 text-xs font-medium flex items-center gap-2 h-10 rounded"
-                  data-testid={`seed-${seed.seed}`}
-                >
-                  <div className="text-muted-foreground font-bold">#{seed.seed}</div>
-                  <div className="flex-1 min-w-0 truncate">{seed.name || "—"}</div>
+        <div className="flex gap-12 items-start min-w-max pb-8 justify-center">
+          {/* SEEDS COLUMN */}
+          <div className="flex flex-col gap-8">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Seeds</div>
+            <div className="flex flex-col gap-2">
+              {SEED_PAIRINGS.map((pairing, idx) => (
+                <div key={idx} className="flex flex-col gap-1">
+                  <SeedBox seed={seeds[pairing.seeds[0] - 1]} />
+                  <SeedBox seed={seeds[pairing.seeds[1] - 1]} />
+                  {idx < SEED_PAIRINGS.length - 1 && <div className="h-4" />}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Matchup Columns */}
-          <MatchColumn round="wildcard" title="Wildcard" />
-          <MatchColumn round="divisional" title="Divisional" />
-          <MatchColumn round="conference" title="Conference" />
-          <MatchColumn round="super_bowl" title="Super Bowl" />
+          {/* WILDCARD COLUMN */}
+          <div className="flex flex-col gap-8">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Wildcard</div>
+            <div className="flex flex-col gap-2">
+              {getMatchesForRound("wildcard").map((match) => (
+                <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
+                  <MatchBox match={match} isTeam1={true} team={match.team1} />
+                  <MatchBox match={match} isTeam1={false} team={match.team2} />
+                  <div className="h-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* DIVISIONAL COLUMN */}
+          <div className="flex flex-col gap-8">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Divisional</div>
+            <div className="flex flex-col gap-2">
+              {getMatchesForRound("divisional").map((match) => (
+                <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
+                  <MatchBox match={match} isTeam1={true} team={match.team1} />
+                  <MatchBox match={match} isTeam1={false} team={match.team2} />
+                  <div className="h-6" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CONFERENCE COLUMN */}
+          <div className="flex flex-col gap-8">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Conference</div>
+            <div className="flex flex-col gap-2">
+              {getMatchesForRound("conference").map((match) => (
+                <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
+                  <MatchBox match={match} isTeam1={true} team={match.team1} />
+                  <MatchBox match={match} isTeam1={false} team={match.team2} />
+                  <div className="h-12" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* SUPER BOWL COLUMN */}
+          <div className="flex flex-col gap-8">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Super Bowl</div>
+            <div className="flex flex-col gap-2">
+              {getMatchesForRound("super_bowl").map((match) => (
+                <div key={match.id} className="flex flex-col gap-0.5" data-testid={`card-match-${match.id}`}>
+                  <MatchBox match={match} isTeam1={true} team={match.team1} />
+                  <MatchBox match={match} isTeam1={false} team={match.team2} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
