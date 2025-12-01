@@ -265,9 +265,30 @@ export default function Playoffs() {
         <div className="flex gap-20 pb-8 pt-8" style={{ alignItems: "center" }}>
           {/* SEEDS COLUMN */}
           <div className="flex flex-col gap-1">
-            {seedOrder.map((seedNum) => (
-              <SeedBox key={seedNum} seed={seeds[seedNum - 1]} />
-            ))}
+            {/* Wildcard seeds: 5, 12, 8, 9, 6, 11, 7, 10 */}
+            <SeedBox seed={seeds[4]} />
+            <SeedBox seed={seeds[11]} />
+            <div className="h-3" />
+            
+            <SeedBox seed={seeds[7]} />
+            <SeedBox seed={seeds[8]} />
+            <div className="h-3" />
+            
+            <SeedBox seed={seeds[5]} />
+            <SeedBox seed={seeds[10]} />
+            <div className="h-3" />
+            
+            <SeedBox seed={seeds[6]} />
+            <SeedBox seed={seeds[9]} />
+            <div className="h-20" />
+            
+            {/* Top seeds: 1, 4, 2, 3 */}
+            <SeedBox seed={seeds[0]} />
+            <SeedBox seed={seeds[3]} />
+            <div className="h-3" />
+            
+            <SeedBox seed={seeds[1]} />
+            <SeedBox seed={seeds[2]} />
           </div>
 
           {/* WILDCARD COLUMN */}
