@@ -218,3 +218,18 @@ export const insertPredictionSchema = createInsertSchema(predictions).omit({
 
 export type InsertPrediction = z.infer<typeof insertPredictionSchema>;
 export type Prediction = typeof predictions.$inferSelect;
+
+// Bracket image table
+export const bracketImages = pgTable("bracket_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  imageUrl: text("image_url").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBracketImageSchema = createInsertSchema(bracketImages).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type InsertBracketImage = z.infer<typeof insertBracketImageSchema>;
+export type BracketImage = typeof bracketImages.$inferSelect;

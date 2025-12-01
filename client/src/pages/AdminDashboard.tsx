@@ -65,12 +65,13 @@ export default function AdminDashboard() {
       </h1>
 
       <Tabs defaultValue="games" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
           <TabsTrigger value="games" data-testid="tab-games">Games</TabsTrigger>
           <TabsTrigger value="scores" data-testid="tab-scores">Scores</TabsTrigger>
           <TabsTrigger value="news" data-testid="tab-news">News</TabsTrigger>
           <TabsTrigger value="pickems" data-testid="tab-pickems">Pick'ems</TabsTrigger>
           <TabsTrigger value="rules" data-testid="tab-rules">Rules</TabsTrigger>
+          <TabsTrigger value="bracket" data-testid="tab-bracket">Bracket</TabsTrigger>
           <TabsTrigger value="changelogs" data-testid="tab-changelogs">Changelogs</TabsTrigger>
         </TabsList>
 
@@ -92,6 +93,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="rules">
           <RulesManager />
+        </TabsContent>
+
+        <TabsContent value="bracket">
+          <BracketManager />
         </TabsContent>
 
         <TabsContent value="changelogs">
@@ -1195,6 +1200,85 @@ function ChangelogManager() {
               </Button>
             </div>
           ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function BracketManager() {
+  const { toast } = useToast();
+  const [imageUrl, setImageUrl] = useState("");
+
+  const { data: bracketImage } = useQuery({
+    queryKey: ["/api/bracket-image"],
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const res = await apiRequest("POST", "/api/bracket-image", { imageUrl: url });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bracket-image"] });
+      setImageUrl("");
+      toast({
+        title: "Success",
+        description: "Bracket image updated",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update bracket image",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string;
+      uploadMutation.mutate(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Playoff Bracket</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="bracket-upload" className="mb-2 block">Upload Bracket Image</Label>
+              <Input
+                id="bracket-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleUpload}
+                disabled={uploadMutation.isPending}
+                data-testid="input-bracket-upload"
+              />
+            </div>
+
+            {bracketImage?.imageUrl && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Current Bracket:</p>
+                <img 
+                  src={bracketImage.imageUrl} 
+                  alt="Current bracket" 
+                  className="max-w-full max-h-96 rounded"
+                  data-testid="img-bracket-preview"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </Card>
     </div>

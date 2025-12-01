@@ -9,6 +9,7 @@ import {
   playoffMatches,
   changelogs,
   predictions,
+  bracketImages,
   type User,
   type UpsertUser,
   type Game,
@@ -29,6 +30,8 @@ import {
   type InsertChangelog,
   type Prediction,
   type InsertPrediction,
+  type BracketImage,
+  type InsertBracketImage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -76,6 +79,9 @@ export interface IStorage {
   
   getPredictionsByGameId(gameId: string): Promise<Prediction[]>;
   createPrediction(prediction: InsertPrediction): Promise<Prediction>;
+  
+  getBracketImage(): Promise<BracketImage | undefined>;
+  upsertBracketImage(image: InsertBracketImage): Promise<BracketImage>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -292,6 +298,25 @@ export class DatabaseStorage implements IStorage {
   async createPrediction(predictionData: InsertPrediction): Promise<Prediction> {
     const [prediction] = await db.insert(predictions).values(predictionData).returning();
     return prediction;
+  }
+
+  async getBracketImage(): Promise<BracketImage | undefined> {
+    const [image] = await db.select().from(bracketImages).limit(1);
+    return image;
+  }
+
+  async upsertBracketImage(imageData: InsertBracketImage): Promise<BracketImage> {
+    const existing = await this.getBracketImage();
+    if (existing) {
+      const [updated] = await db
+        .update(bracketImages)
+        .set({ ...imageData, updatedAt: new Date() })
+        .where(eq(bracketImages.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(bracketImages).values(imageData).returning();
+    return created;
   }
 }
 

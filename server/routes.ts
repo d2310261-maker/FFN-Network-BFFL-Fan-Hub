@@ -13,6 +13,7 @@ import {
   insertPlayoffMatchSchema,
   insertChangelogSchema,
   insertPredictionSchema,
+  insertBracketImageSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -295,6 +296,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching playoff round:", error);
       res.status(500).json({ message: "Failed to fetch playoff round" });
+    }
+  });
+
+  app.get("/api/bracket-image", async (req, res) => {
+    try {
+      const image = await storage.getBracketImage();
+      res.json(image || null);
+    } catch (error) {
+      console.error("Error fetching bracket image:", error);
+      res.status(500).json({ message: "Failed to fetch bracket image" });
+    }
+  });
+
+  app.post("/api/bracket-image", isAuthenticated, async (req, res) => {
+    try {
+      const validated = insertBracketImageSchema.parse(req.body);
+      const image = await storage.upsertBracketImage(validated);
+      res.json(image);
+    } catch (error) {
+      console.error("Error updating bracket image:", error);
+      res.status(400).json({ message: "Failed to update bracket image" });
     }
   });
 
