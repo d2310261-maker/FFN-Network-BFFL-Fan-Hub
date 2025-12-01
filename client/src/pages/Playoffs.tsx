@@ -11,6 +11,11 @@ export default function Playoffs() {
   return (
     <div className="min-h-screen bg-background py-12 flex flex-col items-center justify-center">
       <div className="w-full max-w-6xl px-4">
+        <h1 className="text-4xl md:text-5xl font-black mb-8 text-center" data-testid="text-page-title">
+          BFFL Playoff Bracket
+        </h1>
+      </div>
+      <div className="w-full max-w-6xl px-4">
         {bracketImage?.imageUrl ? (
           <img 
             src={bracketImage.imageUrl} 
