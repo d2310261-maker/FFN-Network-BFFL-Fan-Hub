@@ -1,7 +1,22 @@
-# NFL Fan Hub - Design Guidelines
+# BFFL Fan Hub - Christmas Theme Design Guidelines
 
 ## Design Approach
-**Hybrid Approach**: Drawing inspiration from sports platforms (ESPN, TheScore, NFL.com) combined with Material Design principles for data-dense applications. Focus on scannable information hierarchy, real-time updates, and clear admin controls.
+**Festive Holiday Theme**: A Christmas-themed fantasy football league with traditional festive colors combined with modern sports platform design. Focus on scannable information hierarchy, real-time updates, and clear admin controls, all wrapped in a jolly holiday aesthetic.
+
+## Color Palette (Christmas Theme)
+**Light Mode:**
+- Background: Cream/off-white (warm, inviting)
+- Sidebar: Forest green (primary accent)
+- Primary CTA: Bright Christmas red
+- Accent: Gold/champagne (highlights, badges)
+- Foreground text: Deep forest green (excellent contrast)
+
+**Dark Mode:**
+- Background: Deep forest green (primary)
+- Sidebar: Dark forest green (darker than bg)
+- Primary CTA: Bright red (prominent in dark mode)
+- Accent: Gold/champagne (stands out beautifully)
+- Foreground text: Cream white
 
 ## Typography System
 - **Display/Headers**: Bold sans-serif (Roboto Condensed or similar) - weights 700-900
@@ -29,6 +44,7 @@ Sticky header with horizontal nav bar
 - Main nav items centered: Scores | Schedule | Previous Weeks | News | Pick'ems
 - Admin login/dashboard button on right (when authenticated)
 - Mobile: Hamburger menu with full-screen overlay
+- Christmas styling: Green sidebar with gold accents
 
 ### Live Scores Page
 **Hero Section**: Compact banner (h-32 to h-40) with current week number and live indicator
@@ -71,19 +87,33 @@ Blog-style layout
 - Each card: Title, date, excerpt, read more link
 - Admin controls (add/edit/delete) visible only when authenticated
 
+### Standings Page
+Ranked team standings with manual drag-and-drop reordering
+- Table/list layout showing all teams with win records
+- Manual ordering system for custom standings
+- Visual feedback on drag interactions
+- Gold accents on top teams
+
 ### Pick'ems Page
 Two-column layout (single column on mobile)
 - Left: Current week's pick'em link (large CTA card)
 - Right: Official rules (expandable sections or simple scrollable text)
 - Archive: Dropdown to access previous weeks' pick'ems
 
+### Playoffs Page
+Centered bracket display
+- Uploaded bracket image showcase
+- "BFFL Playoff Bracket" title at top
+- Responsive sizing for mobile/tablet/desktop
+
 ### Admin Dashboard
-Card-based control panel
+Card-based control panel with multiple tabs
 - Game management: Add game form, edit existing games table
 - Score updates: Live score input fields with update buttons
 - Mark final: Toggle switches or buttons per game
 - News management: Create/edit posts with simple form
-- Pick'ems management: URL input for weekly links, rules editor
+- Bracket management: Upload/manage playoff bracket images
+- Changelog: Version tracking and release notes
 
 ## Component Library
 
@@ -109,7 +139,7 @@ Grouped form sections with clear labels
 - Tables: Striped rows, hover states, action column on right
 
 ### Buttons
-- Primary CTA: Rounded, font-semibold, px-6 py-3
+- Primary CTA: Rounded, font-semibold, px-6 py-3 (Christmas red background)
 - Secondary: Outlined variant
 - Icon buttons: Square/circular for actions
 
@@ -122,6 +152,7 @@ Grouped form sections with clear labels
 No hero images needed - this is a data-focused application. Use:
 - Team logos/icons via placeholders or icon fonts (avoid actual NFL trademarks)
 - Generic sports imagery only in news posts if relevant
+- Uploaded bracket images for playoff display
 
 ## Key UX Patterns
 - Real-time updates: Visual indicators for live games
@@ -129,3 +160,4 @@ No hero images needed - this is a data-focused application. Use:
 - Loading states: Skeleton screens for score data
 - Error states: Clear messaging for failed updates
 - Toast notifications: Success/error feedback for admin actions
+- Festive theme: Christmas colors throughout (red, green, gold)
