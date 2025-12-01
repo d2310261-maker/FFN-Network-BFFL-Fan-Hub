@@ -258,9 +258,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createPlayoffMatch({ round: "wildcard", matchNumber: 3 });
       await storage.createPlayoffMatch({ round: "wildcard", matchNumber: 4 });
 
-      // Initialize divisional round (2 matches - 1 left, 1 right)
+      // Initialize divisional round (4 matches)
       await storage.createPlayoffMatch({ round: "divisional", matchNumber: 1 });
       await storage.createPlayoffMatch({ round: "divisional", matchNumber: 2 });
+      await storage.createPlayoffMatch({ round: "divisional", matchNumber: 3 });
+      await storage.createPlayoffMatch({ round: "divisional", matchNumber: 4 });
 
       // Initialize conference round (2 matches - 1 left, 1 right)
       await storage.createPlayoffMatch({ round: "conference", matchNumber: 1 });
