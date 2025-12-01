@@ -14,6 +14,7 @@ import { TEAMS } from "@/lib/teams";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { calculateWinProbability } from "@/lib/winProbability";
 
 export default function GameDetail() {
   const [, params] = useRoute("/game/:id");
@@ -370,18 +371,15 @@ export default function GameDetail() {
                 <p className="font-semibold mb-4">Win Probability & Predictions</p>
                 
                 {(() => {
-                  // Get PD values from standings
                   const team1Standing = standings?.find(s => s.team === game.team1);
                   const team2Standing = standings?.find(s => s.team === game.team2);
                   
                   const team1PD = team1Standing?.pointDifferential || 0;
                   const team2PD = team2Standing?.pointDifferential || 0;
                   
-                  // Calculate win probability based on PD difference
-                  // Each 10 points of PD difference = ~5% win probability swing
-                  const pdDifference = team1PD - team2PD;
-                  const team1Percent = Math.max(15, Math.min(85, Math.round(50 + (pdDifference / 20))));
-                  const team2Percent = 100 - team1Percent;
+                  // Calculate dynamic win probability
+                  const team1Percent = calculateWinProbability(game, "team1", standings);
+                  const team2Percent = calculateWinProbability(game, "team2", standings);
                   
                   return (
                     <div className="mb-6 space-y-3">
@@ -416,7 +414,7 @@ export default function GameDetail() {
                       </div>
                       
                       <p className="text-xs text-muted-foreground text-center mt-3 pt-2 border-t">
-                        Based on Point Differential rankings
+                        {game.isLive ? `Updated live during ${game.quarter}` : 'Based on Point Differential'}
                       </p>
                     </div>
                   );
