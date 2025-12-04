@@ -14,7 +14,7 @@ import { TEAMS } from "@/lib/teams";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
-import { calculateWinProbability } from "@/lib/winProbability";
+import { calculateWinProbability, getWinProbabilityFactors } from "@/lib/winProbability";
 
 export default function GameDetail() {
   const [, params] = useRoute("/game/:id");
@@ -52,6 +52,10 @@ export default function GameDetail() {
 
   const { data: standings } = useQuery<Standings[]>({
     queryKey: ["/api/standings"],
+  });
+
+  const { data: allGames } = useQuery<Game[]>({
+    queryKey: ["/api/games/all"],
   });
 
   const voteMutation = useMutation({
@@ -379,16 +383,20 @@ export default function GameDetail() {
               <div className="pt-4 border-t">
                 <p className="font-semibold mb-4">Win Probability & Predictions</p>
                 
-                {(() => {
+                {(!standings || !allGames) ? (
+                  <div className="mb-6 space-y-3">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                ) : (() => {
                   const team1Standing = standings?.find(s => s.team === game.team1);
                   const team2Standing = standings?.find(s => s.team === game.team2);
                   
-                  const team1PD = team1Standing?.pointDifferential || 0;
-                  const team2PD = team2Standing?.pointDifferential || 0;
+                  const team1Percent = calculateWinProbability(game, "team1", standings, allGames);
+                  const team2Percent = calculateWinProbability(game, "team2", standings, allGames);
                   
-                  // Calculate dynamic win probability
-                  const team1Percent = calculateWinProbability(game, "team1", standings);
-                  const team2Percent = calculateWinProbability(game, "team2", standings);
+                  const factors = getWinProbabilityFactors(game, standings, allGames);
                   
                   return (
                     <div className="mb-6 space-y-3">
@@ -404,7 +412,20 @@ export default function GameDetail() {
                             data-testid={`winprob-bar-${game.team1}`}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{team1Standing?.wins || 0}-{team1Standing?.losses || 0} (PD: {team1PD > 0 ? '+' : ''}{team1PD})</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground">
+                            #{factors?.factors.ranking.team1Rank || '-'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {team1Standing?.wins || 0}-{team1Standing?.losses || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            PD: {(team1Standing?.pointDifferential || 0) > 0 ? '+' : ''}{team1Standing?.pointDifferential || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            SOS: {factors?.factors.schedule.team1SOS || 50}%
+                          </span>
+                        </div>
                       </div>
                       
                       <div>
@@ -419,11 +440,56 @@ export default function GameDetail() {
                             data-testid={`winprob-bar-${game.team2}`}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{team2Standing?.wins || 0}-{team2Standing?.losses || 0} (PD: {team2PD > 0 ? '+' : ''}{team2PD})</p>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground">
+                            #{factors?.factors.ranking.team2Rank || '-'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {team2Standing?.wins || 0}-{team2Standing?.losses || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            PD: {(team2Standing?.pointDifferential || 0) > 0 ? '+' : ''}{team2Standing?.pointDifferential || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            SOS: {factors?.factors.schedule.team2SOS || 50}%
+                          </span>
+                        </div>
                       </div>
                       
+                      {factors && (
+                        <div className="mt-4 pt-3 border-t">
+                          <p className="text-xs font-medium mb-2 text-muted-foreground">Factor Breakdown</p>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Ranking:</span>
+                              <span className={factors.factors.ranking.advantage === game.team1 ? 'text-green-500' : factors.factors.ranking.advantage === game.team2 ? 'text-red-500' : 'text-muted-foreground'}>
+                                {factors.factors.ranking.advantage === "Even" ? "Even" : factors.factors.ranking.advantage === game.team1 ? game.team1 : game.team2}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Record:</span>
+                              <span className={factors.factors.record.advantage === game.team1 ? 'text-green-500' : factors.factors.record.advantage === game.team2 ? 'text-red-500' : 'text-muted-foreground'}>
+                                {factors.factors.record.advantage === "Even" ? "Even" : factors.factors.record.advantage === game.team1 ? game.team1 : game.team2}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Point Diff:</span>
+                              <span className={factors.factors.pointDiff.advantage === game.team1 ? 'text-green-500' : factors.factors.pointDiff.advantage === game.team2 ? 'text-red-500' : 'text-muted-foreground'}>
+                                {factors.factors.pointDiff.advantage === "Even" ? "Even" : factors.factors.pointDiff.advantage === game.team1 ? game.team1 : game.team2}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Schedule:</span>
+                              <span className={factors.factors.schedule.advantage === game.team1 ? 'text-green-500' : factors.factors.schedule.advantage === game.team2 ? 'text-red-500' : 'text-muted-foreground'}>
+                                {factors.factors.schedule.advantage === "Even" ? "Even" : factors.factors.schedule.advantage === game.team1 ? game.team1 : game.team2}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
                       <p className="text-xs text-muted-foreground text-center mt-3 pt-2 border-t">
-                        {game.isLive ? `Updated live during ${game.quarter}` : 'Based on Point Differential'}
+                        {game.isLive ? `Updated live during ${game.quarter}` : 'Based on Rankings, Record, PD & Schedule'}
                       </p>
                     </div>
                   );
