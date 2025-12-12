@@ -23,62 +23,12 @@ import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return null;
-  }
-
-  const christmasElements = Array.from({ length: 80 }).map((_, i) => {
-    const type = i % 4;
-    let content = '❄';
-    if (type === 1) content = '🎄';
-    if (type === 2) content = '🎅';
-    if (type === 3) content = '🎁';
-    
-    return (
-      <div
-        key={i}
-        className="absolute select-none font-bold"
-        style={{
-          fontSize: Math.random() * 24 + 12 + 'px',
-          left: Math.random() * 100 + '%',
-          animation: i % 2 === 0 ? `snowfall ${Math.random() * 12 + 8}s linear infinite` : `snowfall-2 ${Math.random() * 12 + 8}s linear infinite`,
-          animationDelay: Math.random() * 5 + 's',
-          top: -40 + 'px',
-          opacity: Math.random() * 0.4 + 0.6,
-        }}
-      >
-        {content}
-      </div>
-    );
-  });
-
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Falling festive elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {christmasElements}
-      </div>
-
+    <div className="min-h-screen bg-background">
       <Header />
-      
       <Switch>
         <Route path="/" component={Landing} />
-        <Route path="/login" component={Login} />
-        <Route path="/scores" component={LiveScores} />
-        <Route path="/game/:id" component={GameDetail} />
-        <Route path="/previous-weeks" component={PreviousWeeks} />
-        <Route path="/schedule" component={Schedule} />
-        <Route path="/playoffs" component={Playoffs} />
-        <Route path="/standings" component={Standings} />
-        <Route path="/news" component={News} />
-        <Route path="/news/:id" component={NewsDetail} />
-        <Route path="/pickems" component={Pickems} />
-        <Route path="/social" component={SocialLinks} />
-        <Route path="/changelogs" component={Changelogs} />
-        {isAuthenticated && <Route path="/admin" component={AdminDashboard} />}
-        <Route component={NotFound} />
+        <Route component={Landing} />
       </Switch>
     </div>
   );
