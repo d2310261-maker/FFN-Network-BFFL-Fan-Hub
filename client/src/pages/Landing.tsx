@@ -3,7 +3,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-24 flex items-center justify-center min-h-[calc(100vh-4rem)]">
         <div className="text-center">
-          <h1 className="text-5xl md:text-6xl font-black mb-8">BFFL Fan Hub</h1>
+          <h1 className="text-5xl md:text-6xl font-black mb-8">BFFL - Archived</h1>
           <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg p-8 mb-8">
             <p className="text-lg md:text-xl text-foreground mb-4">
               The Discord community that powered BFFL has unfortunately been shut down.
